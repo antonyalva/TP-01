@@ -50,14 +50,14 @@ const SidebarData = [
   },
   //{ caption: 'Apps' },
   {
-    title: 'Doctores',
+    title: 'Pacientes',
     href: '/tables/data-table',
     icon: <Icon.HardDrive />,
     id: 4.3,
     collapisble: false,
   },
   {
-    title: 'Pacientes',
+    title: 'Doctores',
     href: '/tickt/ticket-list',
     icon: <Icon.Disc />,
   },
@@ -315,6 +315,13 @@ const SidebarData = [
     href: '/form-validation',
     icon: <Icon.CheckSquare />,
     id: 3.3,
+    collapisble: false,
+  },
+  {
+    title: 'Registrar paciente',
+    href: '/form-validation-paciente',
+    icon: <Icon.CheckSquare />,
+    //id: 3.3,
     collapisble: false,
   },
   /*{

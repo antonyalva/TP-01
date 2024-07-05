@@ -40,9 +40,9 @@ const LoginFormik = () => {
                 <Formik
                   initialValues={initialValues}
                   validationSchema={validationSchema}
-                  onSubmit={(fields) => {
+                  onSubmit={() => {
                     // eslint-disable-next-line no-alert
-                    alert(`SUCCESS!! :-)\n\n${JSON.stringify(fields, null, 4)}`);
+                    //alert(`SUCCESS!! :-)\n\n${JSON.stringify(fields, null, 4)}`);
                     navigate('/dashboards/minimal');
                   }}
                   render={({ errors, touched }) => (

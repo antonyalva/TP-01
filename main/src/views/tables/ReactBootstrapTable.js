@@ -49,7 +49,7 @@ const Datatables = () => {
       
       <Row>
         <Col md="12">
-          <ComponentCard title="Lista de doctores">
+          <ComponentCard title="Lista de pacientes">
             <BootstrapTable
               striped
               hover
@@ -59,7 +59,6 @@ const Datatables = () => {
               deleteRow
               selectRow={selectRowProp}
               pagination
-              insertRow
               options={options}
               cellEdit={cellEditProp}
               tableHeaderClass="mb-0"

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import React from 'react';
 import { Row, Col, Button, FormGroup, Label } from 'reactstrap';
 // import { Row, Col, Button, FormGroup, Label, ListGroup, ListGroupItem } from 'reactstrap';
 import { useForm } from 'react-hook-form';
@@ -6,21 +7,20 @@ import Form from 'react-validation/build/form';
 import ComponentCard from '../../components/ComponentCard';
 import * as data2 from '../tables/DataBootstrapTable';
 
-/*const RegistrarDoctor = () => {
-    //setComposeModal(!composeModal);
-};*/
 
-const FormValidate = () => {
+
+const FormValidationPaciente = () => {
+  const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors } } = useForm(); // initialise the hook
-  const [setFormvalue] = useState({
-    // const [Formvalue, setFormvalue] = useState({
-    firstname: '',
-    lastname: '',
-    email: '',
-    age: '',
-    title: '',
-    mobile: '',
-  });
+  // const [setFormvalue] = useState({
+  //   // const [Formvalue, setFormvalue] = useState({
+  //   firstname: '',
+  //   lastname: '',
+  //   email: '',
+  //   age: '',
+  //   title: '',
+  //   mobile: '',
+  // });
   const onSubmit = (data) => {
     data2.JsonData.push({
       name: data.firstname,
@@ -29,13 +29,14 @@ const FormValidate = () => {
     });
     console.log(data.firstname)
     //console.log(data2)
-    setFormvalue(data);
+    //setFormvalue(data);
+    navigate('/tables/data-table');
   };
   return (
     <>
       <Row>
         <Col sm="12">
-          <ComponentCard title="Registrar Doctor">
+          <ComponentCard title="Registrar Paciente">
             <Form onSubmit={handleSubmit(onSubmit)}>
               <FormGroup>
                 <Label className="control-Label" htmlFor="firstname">
@@ -100,12 +101,12 @@ const FormValidate = () => {
                 <div className="mb-2">
                   <input
                     type="text"
-                    {...register('mobile', { required: true, maxLength: 11, minLength: 8 })}
+                    {...register('mobile', { required: true, maxLength: 8, minLength: 7 })}
                     className="form-control"
                   />
                 </div>
                 <span className="text-danger">
-                  {errors.mobile && 'Enter a Valid mobile number.'}
+                  {errors.mobile && 'Ingresar DNI correcto.'}
                 </span>
               </FormGroup>
               <FormGroup>
@@ -124,8 +125,8 @@ const FormValidate = () => {
               <FormGroup>
                 <Button className="btn" color="primary" size="lg" block type="submit">
                 {/* <Button className="btn" color="primary" size="lg" block */}
-                  {/* onClick={RegistrarDoctor}> */}
-                  Registrar
+                  {/* onClick={RegistrarPaciente} */}
+                  Registrar Paciente
                 </Button>
 
               </FormGroup>
@@ -137,4 +138,4 @@ const FormValidate = () => {
   );
 };
 
-export default FormValidate;
+export default FormValidationPaciente;

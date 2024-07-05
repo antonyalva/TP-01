@@ -60,6 +60,7 @@ const TagSelect = Loadable(lazy(() => import('../views/form-pickers/TagSelect'))
 
 /***** Form Validation Pages ****/
 const FormValidate = Loadable(lazy(() => import('../views/form-validation/FormValidation')));
+const FormValidatePaciente = Loadable(lazy(() => import('../views/form-validation-paciente/FormValidationPaciente')));
 const FormSteps = Loadable(lazy(() => import('../views/form-steps/Steps')));
 const FormEditor = Loadable(lazy(() => import('../views/form-editor/FormEditor')));
 /***** Table Pages ****/
@@ -160,6 +161,7 @@ const ThemeRoutes = [
       },
       { path: '/form-pickers/tag-select', name: 'tag-select', exact: true, element: <TagSelect /> },
       { path: '/form-validation', name: 'form-validation', exact: true, element: <FormValidate /> },
+      { path: '/form-validation-paciente', name: 'form-validation-paciente', exact: true, element: <FormValidatePaciente /> },
       { path: '/form-steps', name: 'form-steps', exact: true, element: <FormSteps /> },
       { path: '/form-editor', name: 'form-editor', exact: true, element: <FormEditor /> },
 

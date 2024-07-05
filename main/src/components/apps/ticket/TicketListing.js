@@ -1,10 +1,13 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Table, Badge, UncontrolledTooltip, Input } from 'reactstrap';
 import { fetchTickets, DeleteTicket, SearchTicket } from '../../../store/apps/ticket/TicketSlice';
 
+
 const TicketListing = () => {
+  const navigate = useNavigate();
+
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(fetchTickets());
@@ -71,6 +74,7 @@ const TicketListing = () => {
         <span
                         className="btn btn-info text-white"
                         onClick={() => {
+                          navigate('/form-validation-paciente');
                         }}
                       >
                         REGISTRAR PACIENTE
