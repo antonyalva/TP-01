@@ -11,6 +11,10 @@ const App = () => {
   const routing = useRoutes(Themeroutes);
   const direction = useSelector((state) => state.customizer.isRTL);
   const isMode = useSelector((state) => state.customizer.isDark);
+  
+  //const multer = require('multer');
+  //const app = express();
+  
   return (
     <Suspense fallback={<Loader />}>
       <div
@@ -22,6 +26,7 @@ const App = () => {
       </div>
     </Suspense>
   );
+  
 };
 
 export default App;

@@ -12,16 +12,21 @@ function onAfterDeleteRow(rowKeys) {
   // eslint-disable-next-line no-alert
   alert(`The rowkey you drop: ${rowKeys}`);
 }
-//This is for the insert new row
-/*
-function onAfterInsertRow(row) {
-  let newRowStr = '';
+function statusFormatter(cell) {
+  // cell contiene el valor de status ('Aprobado' o 'Reprobado')
+  let iconHtml = '';
 
-  for (const prop in row) {
-    newRowStr += prop + ': ' + row[prop] + ' \n';
+  if (cell === 'YES') {
+    // Insertar ícono de FontAwesome para "Aprobado"
+    iconHtml = '<a href="http://localhost:3000/tickt/ticket-detail" style="color:blue">Tomar test</a>';
+  } else if (cell === 'NO') {
+    // Insertar ícono de FontAwesome para "Reprobado"
+    iconHtml = '<a href="http://localhost:3000/ecom/shopdetail"style="color:green">Ver resultados</a>';
   }
-  alert('The new row is:\n ' + newRowStr);
-}*/
+
+  // Retornar el ícono con innerHTML para que se interprete como HTML
+  return <span dangerouslySetInnerHTML={{ __html: iconHtml }} />;
+}
 //This is for the Search item
 function afterSearch(searchText, result) {
   console.log(`Your search text is ${searchText}`);
@@ -64,13 +69,20 @@ const Datatables = () => {
               tableHeaderClass="mb-0"
             >
               <TableHeaderColumn width="100" dataField="name" isKey>
-                Name
+                Nombre
               </TableHeaderColumn>
               <TableHeaderColumn width="100" dataField="gender">
-                Gender
+                Sexo
               </TableHeaderColumn>
-              <TableHeaderColumn width="100" dataField="company">
-                Company
+              <TableHeaderColumn width="100" dataField="age">
+                Edad
+              </TableHeaderColumn>
+              <TableHeaderColumn width="100" dataField="documento">
+                DNI
+              </TableHeaderColumn>
+              <TableHeaderColumn width="100" dataField="test" dataFormat={statusFormatter}>
+                Test
+                
               </TableHeaderColumn>
             </BootstrapTable>
           </ComponentCard>

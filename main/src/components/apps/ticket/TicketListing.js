@@ -107,7 +107,6 @@ const TicketListing = () => {
                   {ticket.ticketDescription}
                 </small>
               </td>
-
               <td>{ticket.AgentName}</td>
               <td>{ticket.Especialidad}</td>
               <td>{ticket.Date}</td>
