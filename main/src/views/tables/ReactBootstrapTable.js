@@ -50,7 +50,7 @@ const Datatables = () => {
   useEffect(() => {
     const fetchPacientes = async () => {
       try {
-        const response = await axios.get('https://2ewq4qbzqh.execute-api.us-east-1.amazonaws.com/dev/pacientes');
+        const response = await axios.get('/dev/pacientes');
         setPacientes(response.data);
         setLoading(false);
       } catch (err) {
