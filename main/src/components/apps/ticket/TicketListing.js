@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { Table, Badge, UncontrolledTooltip, Input } from 'reactstrap';
+import { Table, Badge, UncontrolledTooltip, Input, Alert } from 'reactstrap';
 import { fetchTickets, DeleteTicket, SearchTicket } from '../../../store/apps/ticket/TicketSlice';
 import axios from 'axios';
 
@@ -11,6 +11,7 @@ const TicketListing = () => {
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [deleteMessage, setDeleteMessage] = useState(null);
 
   useEffect(() => {
     dispatch(fetchTickets());
@@ -25,6 +26,16 @@ const TicketListing = () => {
     } catch (err) {
       setError('Error al cargar los doctores');
       setLoading(false);
+    }
+  };
+
+  const deleteDoctor = async (id) => {
+    try {
+      await axios.delete(`${process.env.REACT_APP_API_URL}/dev/doctores/${id}`);
+      setDeleteMessage({ type: 'success', text: 'Doctor eliminado exitosamente.' });
+      fetchDoctors(); // Recargar la lista de doctores
+    } catch (error) {
+      setDeleteMessage({ type: 'danger', text: 'Error al eliminar el doctor.' });
     }
   };
 
@@ -134,7 +145,7 @@ const TicketListing = () => {
                   <i
                     className="bi bi-trash cursor-pointer"
                     id={`DeleteTooltip-${doctor.id}`}
-                    onClick={() => {/* Implementar eliminación */}}
+                    onClick={() => deleteDoctor(doctor.id)}
                   />
                   <UncontrolledTooltip placement="top" target={`DeleteTooltip-${doctor.id}`}>
                     Eliminar
@@ -144,6 +155,11 @@ const TicketListing = () => {
             ))}
           </tbody>
         </Table>
+      )}
+      {deleteMessage && (
+        <Alert color={deleteMessage.type} className="mt-3">
+          {deleteMessage.text}
+        </Alert>
       )}
     </div>
   );
