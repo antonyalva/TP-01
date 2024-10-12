@@ -1,17 +1,32 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { Table, Badge, UncontrolledTooltip, Input } from 'reactstrap';
 import { fetchTickets, DeleteTicket, SearchTicket } from '../../../store/apps/ticket/TicketSlice';
-
+import axios from 'axios';
 
 const TicketListing = () => {
   const navigate = useNavigate();
-
   const dispatch = useDispatch();
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   useEffect(() => {
     dispatch(fetchTickets());
+    fetchDoctors();
   }, [dispatch]);
+
+  const fetchDoctors = async () => {
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/dev/doctores`);
+      setDoctors(response.data);
+      setLoading(false);
+    } catch (err) {
+      setError('Error al cargar los doctores');
+      setLoading(false);
+    }
+  };
 
   const getVisibleTickets = (tickets, filter, ticketSearch) => {
     switch (filter) {
@@ -81,52 +96,57 @@ const TicketListing = () => {
                       </span>
         </div>
       </div>
-      <Table className="align-middle">
-        <thead>
-          <tr>
-            <th>Código</th>
-            <th>Nombres</th>
-            <th>Apellidos</th>
-            <th>Especialidad atendida</th>
-            <th>Fecha de registro</th>
-            <th>Examen</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {tickets.map((ticket) => (
-            <tr key={ticket.Id}>
-              <td>{ticket.Id}</td>
-              <td>
-                <h5 className="mb-0 mt-2">
-                  <Link to="/apps/ticket-detail" className="text-dark text-decoration-none">
-                    {ticket.ticketTitle}
-                  </Link>
-                </h5>
-                <small className="text-muted d-block text-truncate mb-2" style={{ width: '300px' }}>
-                  {ticket.ticketDescription}
-                </small>
-              </td>
-              <td>{ticket.AgentName}</td>
-              <td>{ticket.Especialidad}</td>
-              <td>{ticket.Date}</td>
-              <td>
-                <Badge color={ticket.Label}>{ticket.Status}</Badge>
-              </td>
-              <td>
-                <i
-                  className="bi bi-archive cursor-pointer"
-                  id="TooltipExample"
-                  onClick={() => dispatch(DeleteTicket(ticket.Id))}
-                />
-                <UncontrolledTooltip placement="left" target="TooltipExample">
-                  Delete
-                </UncontrolledTooltip>
-              </td>
+      {loading ? (
+        <div>Cargando...</div>
+      ) : error ? (
+        <div>{error}</div>
+      ) : (
+        <Table className="align-middle">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombres</th>
+              <th>Apellidos</th>
+              <th>Email</th>
+              <th>Documento de Identidad</th>
+              <th>Edad</th>
+              <th>Especialidad</th>
+              <th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </Table>
+          </thead>
+          <tbody>
+            {doctors.map((doctor) => (
+              <tr key={doctor.id}>
+                <td>{doctor.id}</td>
+                <td>{doctor.nombres}</td>
+                <td>{doctor.apellidos}</td>
+                <td>{doctor.email}</td>
+                <td>{doctor.documento_identidad}</td>
+                <td>{doctor.edad}</td>
+                <td>{doctor.especialidad}</td>
+                <td>
+                  <i
+                    className="bi bi-pencil cursor-pointer me-2"
+                    id={`EditTooltip-${doctor.id}`}
+                    onClick={() => {/* Implementar edición */}}
+                  />
+                  <UncontrolledTooltip placement="top" target={`EditTooltip-${doctor.id}`}>
+                    Editar
+                  </UncontrolledTooltip>
+                  <i
+                    className="bi bi-trash cursor-pointer"
+                    id={`DeleteTooltip-${doctor.id}`}
+                    onClick={() => {/* Implementar eliminación */}}
+                  />
+                  <UncontrolledTooltip placement="top" target={`DeleteTooltip-${doctor.id}`}>
+                    Eliminar
+                  </UncontrolledTooltip>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      )}
     </div>
   );
 };
