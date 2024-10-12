@@ -104,7 +104,6 @@ const TicketListing = () => {
         <Table className="align-middle">
           <thead>
             <tr>
-              <th>ID</th>
               <th>Nombres</th>
               <th>Apellidos</th>
               <th>Email</th>
@@ -117,7 +116,6 @@ const TicketListing = () => {
           <tbody>
             {doctors.map((doctor) => (
               <tr key={doctor.id}>
-                <td>{doctor.id}</td>
                 <td>{doctor.nombres}</td>
                 <td>{doctor.apellidos}</td>
                 <td>{doctor.email}</td>
