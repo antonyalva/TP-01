@@ -83,7 +83,7 @@ const FormValidate = () => {
                 <div className="mb-2">
                   <input
                     type="text"
-                    {...register('usernemailame', { required: true, pattern: /^\S+@\S+$/i })}
+                    {...register('email', { required: true, pattern: /^\S+@\S+$/i })}
                     className="form-control"
                   />
                 </div>
