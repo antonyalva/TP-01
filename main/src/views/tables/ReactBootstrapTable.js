@@ -82,7 +82,6 @@ const Datatables = () => {
               </TableHeaderColumn>
               <TableHeaderColumn width="100" dataField="test" dataFormat={statusFormatter}>
                 Test
-                
               </TableHeaderColumn>
             </BootstrapTable>
           </ComponentCard>
