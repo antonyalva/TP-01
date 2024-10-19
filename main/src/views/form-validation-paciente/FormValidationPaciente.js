@@ -1,70 +1,31 @@
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import axios from 'axios';
-import React from 'react';
-import { Row, Col, Button, FormGroup, Label } from 'reactstrap';
-// import { Row, Col, Button, FormGroup, Label, ListGroup, ListGroupItem } from 'reactstrap';
+import { Row, Col, Button, FormGroup, Label, Alert } from 'reactstrap';
 import { useForm } from 'react-hook-form';
 import Form from 'react-validation/build/form';
 import ComponentCard from '../../components/ComponentCard';
-import * as data2 from '../tables/DataBootstrapTable';
-
-
 
 const FormValidationPaciente = () => {
-  const navigate = useNavigate();
-  const { register, handleSubmit, formState: { errors }, watch } = useForm();
-  //const { register, handleSubmit, formState: { errors } } = useForm(); // initialise the hook
-  // const [setFormvalue] = useState({
-  //   // const [Formvalue, setFormvalue] = useState({
-  //   firstname: '',
-  //   lastname: '',
-  //   email: '',
-  //   age: '',
-  //   title: '',
-  //   mobile: '',
-  // });
+  const { register, handleSubmit, formState: { errors }, reset } = useForm();
+  const [submitStatus, setSubmitStatus] = useState(null);
 
-
-  const firstnameValue = watch('firstname');
-  const usernemailame = watch('usernemailame');
-  
-   
-  const handleRegistrarPaciente = async () => {
+  const onSubmit = async (data) => {
     try {
-      // Establecemos la base URL global para Axios
-      axios.defaults.baseURL = 'http://localhost:4000';
-  
-      // Llamada al servicio
-      console.log('ingresó');
-      const response = await axios.post('api/auth/new', {
-        // Datos del paciente
-        name: firstnameValue,
-        email: usernemailame,
-        password: "123456"
-        // ... otros campos
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/dev/pacientes`, {
+        nombres: data.firstname,
+        apellidos: data.lastname,
+        email: data.email,
+        documento_identidad: data.mobile,
+        edad: parseInt(data.age, 10),
+        compañia: data.compañia
       });
-  
-      console.log('Paciente registrado con éxito:', response.data);
-      // Aquí puedes agregar más lógica después de registrar el paciente
+      console.log(response.data);
+      setSubmitStatus({ type: 'success', message: 'Paciente registrado exitosamente' });
+      reset();
     } catch (error) {
       console.error('Error al registrar paciente:', error);
-      // Manejo de errores
-    } finally {
-      // setLoading(false);
+      setSubmitStatus({ type: 'error', message: 'Error al registrar paciente' });
     }
-  };
-  
-
-  const onSubmit = (data) => {
-    data2.JsonData.push({
-      name: data.firstname,
-      gender: data.firstname,
-      email: data.email,
-    });
-    console.log(data.firstname)
-    //console.log(data2)
-    //setFormvalue(data);
-    navigate('/tables/data-table');
   };
   return (
     <>
@@ -117,16 +78,16 @@ const FormValidationPaciente = () => {
               </FormGroup> */}
               <FormGroup>
                 <Label className="control-Label" htmlFor="email">
-                email
+                  Email
                 </Label>
                 <div className="mb-2">
                   <input
                     type="text"
-                    {...register('usernemailame', { required: true, pattern: /^\S+@\S+$/i })}
+                    {...register('email', { required: true, pattern: /^\S+@\S+$/i })}
                     className="form-control"
                   />
                 </div>
-                <span className="text-danger">{errors.email && 'Email is required.'}</span>
+                <span className="text-danger">{errors.email && 'Email es requerido.'}</span>
               </FormGroup>
               <FormGroup>
                 <Label className="control-Label" htmlFor="mobile">
@@ -135,12 +96,12 @@ const FormValidationPaciente = () => {
                 <div className="mb-2">
                   <input
                     type="text"
-                    {...register('mobile', { required: true, maxLength: 8, minLength: 7 })}
+                    {...register('mobile', { required: true, maxLength: 8, minLength: 8 })}
                     className="form-control"
                   />
                 </div>
                 <span className="text-danger">
-                  {errors.mobile && 'Ingresar DNI correcto.'}
+                  {errors.mobile && 'Ingresar DNI correcto de 8 dígitos.'}
                 </span>
               </FormGroup>
               <FormGroup>
@@ -154,18 +115,32 @@ const FormValidationPaciente = () => {
                     className="form-control"
                   />
                 </div>
-                <span className="text-danger">{errors.age && 'Please enter number for age.'}</span>
+                <span className="text-danger">{errors.age && 'Por favor, ingrese un número para la edad.'}</span>
               </FormGroup>
-              <FormGroup>                 
-                <Button  onClick={handleRegistrarPaciente}
-                className="btn" color="primary" size="lg" block type="button"
-                >
-                {/* <Button className="btn" color="primary" size="lg" block */}
+              <FormGroup>
+                <Label className="control-Label" htmlFor="compañia">
+                  Compañía
+                </Label>
+                <div className="mb-2">
+                  <input
+                    type="text"
+                    {...register('compañia', { required: true })}
+                    className="form-control"
+                  />
+                </div>
+                <span className="text-danger">{errors.compañia && 'La compañía es requerida.'}</span>
+              </FormGroup>
+              <FormGroup>
+                <Button className="btn" color="primary" size="lg" block type="submit">
                   Registrar Paciente
                 </Button>
-
               </FormGroup>
             </Form>
+            {submitStatus && (
+              <Alert color={submitStatus.type === 'success' ? 'success' : 'danger'}>
+                {submitStatus.message}
+              </Alert>
+            )}
           </ComponentCard>
         </Col>
       </Row>

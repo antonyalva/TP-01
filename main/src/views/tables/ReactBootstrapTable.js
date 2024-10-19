@@ -1,70 +1,101 @@
-import React from 'react';
-import { Row, Col } from 'reactstrap';
+import React, { useState, useEffect } from 'react';
+import { Row, Col, Alert } from 'reactstrap';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
-import { useNavigate } from 'react-router-dom';
-import * as data from './DataBootstrapTable';
+import axios from 'axios';
 import './ReactBootstrapTable.scss';
-
-
+import { useNavigate } from 'react-router-dom';
 import ComponentCard from '../../components/ComponentCard';
 
-//This is for the Delete row
-function onAfterDeleteRow(rowKeys) {
-  // eslint-disable-next-line no-alert
-  alert(`The rowkey you drop: ${rowKeys}`);
-}
-function statusFormatter(cell) {
-  // cell contiene el valor de status ('Aprobado' o 'Reprobado')
+/*function statusFormatter(cell) {
   let iconHtml = '';
 
   if (cell === 'YES') {
-    // Insertar ícono de FontAwesome para "Aprobado"
     iconHtml = '<a href="http://localhost:3000/tickt/ticket-detail" style="color:blue">Tomar test</a>';
   } else if (cell === 'NO') {
-    // Insertar ícono de FontAwesome para "Reprobado"
     iconHtml = '<a href="http://localhost:3000/ecom/shopdetail"style="color:green">Ver resultados</a>';
   }
 
-  // Retornar el ícono con innerHTML para que se interprete como HTML
   return <span dangerouslySetInnerHTML={{ __html: iconHtml }} />;
-}
-//This is for the Search item
+}*/
+
 function afterSearch(searchText, result) {
   console.log(`Your search text is ${searchText}`);
-  console.log('Result is:');
-  for (let i = 0; i < result.length; i++) {
-    console.log(`Fruit: ${result[i].id}, ${result[i].name}, ${result[i].price}`);
-  }
+  console.log('Result is:', result);
 }
-const options = {
-  //afterInsertRow: onAfterInsertRow,  // A hook for after insert rows
-  afterDeleteRow: onAfterDeleteRow, // A hook for after droping rows.
-  afterSearch, // define a after search hook
-};
-const selectRowProp = {
-  mode: 'checkbox',
-};
-const cellEditProp = {
-  mode: 'click',
-  blurToSave: true,
-};
 
 const Datatables = () => {
+  const [pacientes, setPacientes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [deleteMessage, setDeleteMessage] = useState(null);
   const navigate = useNavigate();
+
+
+  const fetchPacientes = async () => {
+    try {
+      console.log('ingresó', process.env.REACT_APP_API_URL);
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/dev/pacientes`);
+      console.log('ingresó2', response);
+      setPacientes(response.data);
+      setLoading(false);
+    } catch (err) {
+      setError('error al cargar los pacientes');
+      setLoading(false);
+    }
+  };
+
+  const onAfterDeleteRow = async (rowKeys) => {
+    if (rowKeys.length !== 1) {
+      setDeleteMessage({ type: 'danger', text: 'Por favor, seleccione solo un paciente para eliminar.' });
+      return;
+    }
+
+    try {
+      await axios.delete(`${process.env.REACT_APP_API_URL}/dev/pacientes/${rowKeys[0]}`);
+      setDeleteMessage({ type: 'success', text: 'Paciente eliminado exitosamente.' });
+      fetchPacientes(); // Recargar la lista de pacientes
+    } catch {
+      setDeleteMessage({ type: 'danger', text: 'Error al eliminar el paciente.' });
+    }
+  };
+
+  const options = {
+    afterDeleteRow: onAfterDeleteRow,
+    afterSearch,
+  };
+
+  const selectRowProp = {
+    mode: 'checkbox',
+  };
+
+  const cellEditProp = {
+    mode: 'click',
+    blurToSave: true,
+  };
+
+  useEffect(() => {
+    fetchPacientes();
+  }, []);
+
+  if (loading) return <div>Cargando...</div>;
+  if (error) return <div>{error}</div>;
 
   return (
     <div>
-
       <Row>
         <Col md="12">
           <ComponentCard title="Lista de pacientes">
-            
+            {deleteMessage && (
+              <Alert color={deleteMessage.type} className="mb-3">
+                {deleteMessage.text}
+              </Alert>
+            )}
             <BootstrapTable
               striped
               hover
               condensed
               search
-              data={data.JsonData}
+              data={pacientes}
               deleteRow
               selectRow={selectRowProp}
               pagination
@@ -72,20 +103,23 @@ const Datatables = () => {
               cellEdit={cellEditProp}
               tableHeaderClass="mb-0"
             >
-              <TableHeaderColumn width="100" dataField="name" isKey>
+              <TableHeaderColumn width="100" dataField="id" isKey hidden>
+                ID
+              </TableHeaderColumn>
+              <TableHeaderColumn width="100" dataField="nombres">
                 Nombre
               </TableHeaderColumn>
-              <TableHeaderColumn width="100" dataField="gender">
-                Sexo
+              <TableHeaderColumn width="100" dataField="apellidos">
+                Apellidos
               </TableHeaderColumn>
-              <TableHeaderColumn width="100" dataField="age">
+              <TableHeaderColumn width="100" dataField="edad">
                 Edad
               </TableHeaderColumn>
-              <TableHeaderColumn width="100" dataField="documento">
+              <TableHeaderColumn width="100" dataField="documento_identidad">
                 DNI
               </TableHeaderColumn>
-              <TableHeaderColumn width="100" dataField="test" dataFormat={statusFormatter}>
-                Test
+              <TableHeaderColumn width="100" dataField="compañia">
+                Compañía
               </TableHeaderColumn>
             </BootstrapTable>
             <div className="row">
@@ -108,4 +142,5 @@ const Datatables = () => {
     </div>
   );
 };
+
 export default Datatables;
