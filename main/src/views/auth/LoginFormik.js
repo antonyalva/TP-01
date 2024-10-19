@@ -2,8 +2,9 @@ import React from 'react';
 //import { Button, Label, FormGroup, Container, Row, Col, Card, CardBody, Input } from 'reactstrap';
 import { Button, Label, FormGroup, Container, Row, Col, Card, CardBody } from 'reactstrap';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
+import axios from 'axios';
 import * as Yup from 'yup';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link , useNavigate  } from 'react-router-dom';
 //import AuthLogo from "../../layouts/logo/AuthLogo";
 import { ReactComponent as LeftBg } from '../../assets/images/bg/login-bgleft.svg';
 import { ReactComponent as RightBg } from '../../assets/images/bg/login-bg-right.svg';
@@ -22,6 +23,37 @@ const LoginFormik = () => {
       .min(6, 'Password must be at least 6 characters')
       .required('Password is required'),
   });
+
+
+
+  const loginUsuario = async (emailValue,passwordValue) => {
+    try {
+      console.log(emailValue)
+      console.log(passwordValue)
+      // Establecemos la base URL global para Axios
+      axios.defaults.baseURL = 'http://localhost:4000';
+
+      // Llamada al servicio
+      console.log('ingresó',);
+
+      const response = await axios.post('api/auth', {
+        // Datos del paciente
+        email: emailValue,
+        password: passwordValue
+        // ... otros campos
+      });
+
+      console.log('paciente logeado:', response.data);
+      navigate('/dashboards/minimal');
+      // Aquí puedes agregar más lógica después de registrar el paciente
+    } catch (error) {
+      console.error('Error al logear:', error);
+      // Manejo de errores
+    } finally {
+      // setLoading(false);
+    }
+  };
+
 
   return (
     <div className="loginBox">
@@ -43,18 +75,18 @@ const LoginFormik = () => {
                   onSubmit={() => {
                     // eslint-disable-next-line no-alert
                     //alert(`SUCCESS!! :-)\n\n${JSON.stringify(fields, null, 4)}`);
-                    navigate('/dashboards/minimal');
+                    //navigate('/dashboards/minimal');
                   }}
-                  render={({ errors, touched }) => (
+                  render={({ values, errors, touched }) => (
                     <Form>
                       <FormGroup>
                         <Label htmlFor="email">Email</Label>
                         <Field
                           name="email"
                           type="text"
-                          className={`form-control${
-                            errors.email && touched.email ? ' is-invalid' : ''
-                          }`}
+                          value={values.email} // Asegúrate de que el valor se actualice correctamente
+                          className={`form-control${errors.email && touched.email ? ' is-invalid' : ''
+                            }`}
                         />
                         <ErrorMessage name="email" component="div" className="invalid-feedback" />
                       </FormGroup>
@@ -63,9 +95,9 @@ const LoginFormik = () => {
                         <Field
                           name="password"
                           type="password"
-                          className={`form-control${
-                            errors.password && touched.password ? ' is-invalid' : ''
-                          }`}
+                          value={values.password} // Asegúrate de que el valor se actualice correctamente
+                          className={`form-control${errors.password && touched.password ? ' is-invalid' : ''
+                            }`}
                         />
                         <ErrorMessage
                           name="password"
@@ -83,7 +115,12 @@ const LoginFormik = () => {
                         </Link>
                       </FormGroup>
                       <FormGroup>
-                        <Button type="submit" color="primary" className="me-2">
+                        <Button onClick={() => {
+                          const emailValue = values.email;
+                          const passwordValue = values.password;
+                          loginUsuario(emailValue,passwordValue);
+                        }}
+                          type="submit" color="primary" className="me-2">
                           Ingresar
                         </Button>
                       </FormGroup>

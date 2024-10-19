@@ -1,6 +1,7 @@
 import React from 'react';
 import { Row, Col } from 'reactstrap';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
+import { useNavigate } from 'react-router-dom';
 import * as data from './DataBootstrapTable';
 import './ReactBootstrapTable.scss';
 
@@ -49,12 +50,15 @@ const cellEditProp = {
 };
 
 const Datatables = () => {
+  const navigate = useNavigate();
+
   return (
     <div>
-      
+
       <Row>
         <Col md="12">
           <ComponentCard title="Lista de pacientes">
+            
             <BootstrapTable
               striped
               hover
@@ -84,6 +88,20 @@ const Datatables = () => {
                 Test
               </TableHeaderColumn>
             </BootstrapTable>
+            <div className="row">
+              <div className="col-9">
+              </div>
+              <div className="col-3 d-flex-end text-end"  >
+                <span
+                  className="btn btn-info text-white"
+                  onClick={() => {
+                    navigate('/form-validation-paciente');
+                  }}
+                >
+                  REGISTRAR PACIENTE
+                </span>
+              </div>
+            </div>
           </ComponentCard>
         </Col>
       </Row>

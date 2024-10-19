@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import React from 'react';
 import { Row, Col, Button, FormGroup, Label } from 'reactstrap';
 // import { Row, Col, Button, FormGroup, Label, ListGroup, ListGroupItem } from 'reactstrap';
@@ -11,7 +12,8 @@ import * as data2 from '../tables/DataBootstrapTable';
 
 const FormValidationPaciente = () => {
   const navigate = useNavigate();
-  const { register, handleSubmit, formState: { errors } } = useForm(); // initialise the hook
+  const { register, handleSubmit, formState: { errors }, watch } = useForm();
+  //const { register, handleSubmit, formState: { errors } } = useForm(); // initialise the hook
   // const [setFormvalue] = useState({
   //   // const [Formvalue, setFormvalue] = useState({
   //   firstname: '',
@@ -21,6 +23,38 @@ const FormValidationPaciente = () => {
   //   title: '',
   //   mobile: '',
   // });
+
+
+  const firstnameValue = watch('firstname');
+  const usernemailame = watch('usernemailame');
+  
+   
+  const handleRegistrarPaciente = async () => {
+    try {
+      // Establecemos la base URL global para Axios
+      axios.defaults.baseURL = 'http://localhost:4000';
+  
+      // Llamada al servicio
+      console.log('ingresó');
+      const response = await axios.post('api/auth/new', {
+        // Datos del paciente
+        name: firstnameValue,
+        email: usernemailame,
+        password: "123456"
+        // ... otros campos
+      });
+  
+      console.log('Paciente registrado con éxito:', response.data);
+      // Aquí puedes agregar más lógica después de registrar el paciente
+    } catch (error) {
+      console.error('Error al registrar paciente:', error);
+      // Manejo de errores
+    } finally {
+      // setLoading(false);
+    }
+  };
+  
+
   const onSubmit = (data) => {
     data2.JsonData.push({
       name: data.firstname,
@@ -122,10 +156,11 @@ const FormValidationPaciente = () => {
                 </div>
                 <span className="text-danger">{errors.age && 'Please enter number for age.'}</span>
               </FormGroup>
-              <FormGroup>
-                <Button className="btn" color="primary" size="lg" block type="submit">
+              <FormGroup>                 
+                <Button  onClick={handleRegistrarPaciente}
+                className="btn" color="primary" size="lg" block type="button"
+                >
                 {/* <Button className="btn" color="primary" size="lg" block */}
-                  {/* onClick={RegistrarPaciente} */}
                   Registrar Paciente
                 </Button>
 

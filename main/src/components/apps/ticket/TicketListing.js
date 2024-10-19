@@ -68,17 +68,17 @@ const TicketListing = () => {
           />
         </div>
         <div className="col-6 ">
-          
+
         </div>
-        <div className="col-3 ">
-        <span
-                        className="btn btn-info text-white"
-                        onClick={() => {
-                          navigate('/form-validation-paciente');
-                        }}
-                      >
-                        REGISTRAR PACIENTE
-                      </span>
+        <div className="col-3 d-flex-end text-end"  >
+          <span
+            className="btn btn-info text-white ps-sm-"
+            onClick={() => {
+              navigate('/form-validation');
+            }}
+          >
+            REGISTRAR DOCTORES
+          </span>
         </div>
       </div>
       <Table className="align-middle">
