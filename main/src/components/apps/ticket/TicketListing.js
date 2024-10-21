@@ -6,8 +6,8 @@ import axios from 'axios';
 import { fetchTickets, SearchTicket } from '../../../store/apps/ticket/TicketSlice';
 
 // Función para obtener el token de autorización
-const getAuthToken = () => {
-  return sessionStorage.getItem('authToken');
+const getIdToken = () => {
+  return sessionStorage.getItem('IdToken');
 };
 
 // Configuración de axios con el token de autorización
@@ -17,9 +17,9 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = getAuthToken();
+    const token = getIdToken();
     if (token) {
-      config.headers.Authorization = token;
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
