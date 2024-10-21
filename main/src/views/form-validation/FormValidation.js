@@ -38,7 +38,8 @@ const FormValidate = () => {
         email: data.email,
         documento_identidad: data.mobile,
         edad: parseInt(data.age, 10),
-        especialidad: data.especialidad
+        especialidad: data.especialidad,
+        password: data.password
       });
       console.log(response.data);
       setSubmitStatus({ type: 'success', message: 'Doctor registrado exitosamente' });
@@ -150,6 +151,27 @@ const FormValidate = () => {
                   />
                 </div>
                 <span className="text-danger">{errors.especialidad && 'La especialidad es requerida.'}</span>
+              </FormGroup>
+              <FormGroup>
+                <Label className="control-Label" htmlFor="password">
+                  Contraseña
+                </Label>
+                <div className="mb-2">
+                  <input
+                    type="password"
+                    {...register('password', { 
+                      required: true, 
+                      minLength: {
+                        value: 8,
+                        message: 'La contraseña debe tener al menos 8 caracteres'
+                      }
+                    })}
+                    className="form-control"
+                  />
+                </div>
+                <span className="text-danger">
+                  {errors.password && (errors.password.message || 'La contraseña es requerida.')}
+                </span>
               </FormGroup>
               <FormGroup>
                 <Button className="btn" color="primary" size="lg" block type="submit">
