@@ -3,8 +3,6 @@ import { Row, Col, Alert, Button } from 'reactstrap';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import axios from 'axios';
 import './ReactBootstrapTable.scss';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStethoscope, faFileAlt } from '@fortawesome/free-solid-svg-icons';
 
 import ComponentCard from '../../components/ComponentCard';
 
@@ -86,7 +84,8 @@ const Datatables = () => {
     blurToSave: true,
   };
 
-  const optionsFormatter = (cell, row) => {
+  // const optionsFormatter = (cell, row) => {
+  const optionsFormatter = () => {
     return (
       <div>
         <Button color="link" className="p-0 mr-2" title="Realizar examen">
