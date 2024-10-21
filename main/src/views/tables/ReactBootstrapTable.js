@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Alert, Button } from 'reactstrap';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import './ReactBootstrapTable.scss';
 
 import ComponentCard from '../../components/ComponentCard';
@@ -35,6 +36,7 @@ function afterSearch(searchText, result) {
 }
 
 const Datatables = () => {
+  const navigate = useNavigate();
   const [pacientes, setPacientes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -84,13 +86,24 @@ const Datatables = () => {
     blurToSave: true,
   };
 
-  const optionsFormatter = () => {
+  const optionsFormatter = (cell, row) => {
     return (
       <div>
-        <Button color="primary" size="sm" className="mr-2" title="Realizar examen">
+        <Button 
+          color="primary" 
+          size="sm" 
+          className="mr-2" 
+          title="Realizar examen"
+          onClick={() => navigate(`/apps/ticket-detail/${row.id}`)}
+        >
           Realizar examen
         </Button>
-        <Button color="info" size="sm" title="Ver resultado examen">
+        <Button 
+          color="info" 
+          size="sm" 
+          title="Ver resultado examen"
+          onClick={() => navigate(`/apps/ecommerce/shopdetail/${row.id}`)}
+        >
           Ver resultado
         </Button>
       </div>
