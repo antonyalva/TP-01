@@ -1,15 +1,15 @@
-import React from 'react';
-//import { Button, Label, FormGroup, Container, Row, Col, Card, CardBody, Input } from 'reactstrap';
-import { Button, Label, FormGroup, Container, Row, Col, Card, CardBody } from 'reactstrap';
+import React, { useState } from 'react';
+import { Button, Label, FormGroup, Container, Row, Col, Card, CardBody, Alert } from 'reactstrap';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { Link, useNavigate } from 'react-router-dom';
-//import AuthLogo from "../../layouts/logo/AuthLogo";
+import axios from 'axios';
 import { ReactComponent as LeftBg } from '../../assets/images/bg/login-bgleft.svg';
 import { ReactComponent as RightBg } from '../../assets/images/bg/login-bg-right.svg';
 
 const LoginFormik = () => {
   const navigate = useNavigate();
+  const [loginError, setLoginError] = useState(null);
 
   const initialValues = {
     email: '',
@@ -22,6 +22,28 @@ const LoginFormik = () => {
       .min(6, 'Password must be at least 6 characters')
       .required('Password is required'),
   });
+
+  const handleSubmit = async (values, { setSubmitting }) => {
+    try {
+      const response = await axios.post('https://2ewq4qbzqh.execute-api.us-east-1.amazonaws.com/dev/login', {
+        email: values.email,
+        password: values.password,
+      });
+
+      if (response.data && response.data.accessToken) {
+        // Almacenar el token en sessionStorage
+        sessionStorage.setItem('authToken', response.data.accessToken);
+        // Redirigir al dashboard
+        navigate('/dashboards/minimal');
+      } else {
+        setLoginError('Login failed. Please try again.');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setLoginError('An error occurred during login. Please try again.');
+    }
+    setSubmitting(false);
+  };
 
   return (
     <div className="loginBox">
@@ -37,15 +59,13 @@ const LoginFormik = () => {
                 {/* <small className="pb-4 d-block">
                   <Link to="/auth/registerformik">Sign Up</Link>
                 </small> */}
+                {loginError && <Alert color="danger">{loginError}</Alert>}
                 <Formik
                   initialValues={initialValues}
                   validationSchema={validationSchema}
-                  onSubmit={() => {
-                    // eslint-disable-next-line no-alert
-                    //alert(`SUCCESS!! :-)\n\n${JSON.stringify(fields, null, 4)}`);
-                    navigate('/dashboards/minimal');
-                  }}
-                  render={({ errors, touched }) => (
+                  onSubmit={handleSubmit}
+                >
+                  {({ errors, touched, isSubmitting }) => (
                     <Form>
                       <FormGroup>
                         <Label htmlFor="email">Email</Label>
@@ -83,8 +103,8 @@ const LoginFormik = () => {
                         </Link>
                       </FormGroup>
                       <FormGroup>
-                        <Button type="submit" color="primary" className="me-2">
-                          Ingresar
+                        <Button type="submit" color="primary" className="me-2" disabled={isSubmitting}>
+                          {isSubmitting ? 'Ingresando...' : 'Ingresar'}
                         </Button>
                       </FormGroup>
                     </Form>
