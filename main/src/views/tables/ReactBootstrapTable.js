@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Alert } from 'reactstrap';
+import { Row, Col, Alert, Button } from 'reactstrap';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import axios from 'axios';
 import './ReactBootstrapTable.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faStethoscope, faFileAlt } from '@fortawesome/free-solid-svg-icons';
 
 import ComponentCard from '../../components/ComponentCard';
 
@@ -84,6 +86,19 @@ const Datatables = () => {
     blurToSave: true,
   };
 
+  const optionsFormatter = (cell, row) => {
+    return (
+      <div>
+        <Button color="link" className="p-0 mr-2" title="Realizar examen">
+          <FontAwesomeIcon icon={faStethoscope} />
+        </Button>
+        <Button color="link" className="p-0" title="Ver resultado examen">
+          <FontAwesomeIcon icon={faFileAlt} />
+        </Button>
+      </div>
+    );
+  };
+
   if (loading) return <div>Cargando...</div>;
   if (error) return <div>{error}</div>;
 
@@ -127,6 +142,9 @@ const Datatables = () => {
               </TableHeaderColumn>
               <TableHeaderColumn width="100" dataField="compañia">
                 Compañía
+              </TableHeaderColumn>
+              <TableHeaderColumn width="100" dataField="opciones" dataFormat={optionsFormatter}>
+                Opciones
               </TableHeaderColumn>
             </BootstrapTable>
           </ComponentCard>
