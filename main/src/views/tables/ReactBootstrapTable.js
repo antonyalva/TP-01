@@ -94,7 +94,7 @@ const Datatables = () => {
           size="sm" 
           className="mr-2" 
           title="Realizar examen"
-          onClick={() => navigate(`/apps/ticket-detail/${row.id}`)}
+          onClick={() => navigate(`/tickt/ticket-detail`, { state: { pacienteId: row.id } })}
         >
           Realizar examen
         </Button>

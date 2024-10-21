@@ -1,28 +1,38 @@
-import React , { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-//import Chart from 'react-apexcharts';
+import { useLocation } from 'react-router-dom';
 import {
   Row,
   Col,
   Card,
   CardBody,
   Media,
-  //Badge,
   Button,
   CardTitle,
   CardSubtitle,
   Input,
 } from 'reactstrap';
 
-//import ComponentCard from '../../../components/ComponentCard';
 import img1 from '../../../assets/images/users/user1.jpg';
-//import img2 from '../../../assets/images/users/user2.jpg';
-//import img3 from '../../../assets/images/users/user3.jpg';
-//import img4 from '../../../assets/images/users/user4.jpg';
 
 const TicketDetail = () => {
-  console.log('entra al ticketdetail');
-  const [file,setFile] = useState(null);
+  const location = useLocation();
+  const pacienteId = location.state?.pacienteId;
+  const [file, setFile] = useState(null);
+  const [paciente, setPaciente] = useState(null);
+
+  useEffect(() => {
+    if (pacienteId) {
+      // Aquí deberías hacer una llamada a tu API para obtener los detalles del paciente
+      // Por ahora, simularemos esto con un objeto de paciente de ejemplo
+      setPaciente({
+        id: pacienteId,
+        nombres: "Nombre del Paciente",
+        apellidos: "Apellidos del Paciente",
+        email: "paciente@example.com"
+      });
+    }
+  }, [pacienteId]);
   const handleFileChange = (e) => {
     setFile(e.target.files[0]); // Guardamos el archivo seleccionado en el estado
   };
@@ -105,21 +115,12 @@ const TicketDetail = () => {
             <CardBody className="text-center p-4 border-bottom">
               <img src={img1} className="rounded-circle" width="90" alt="avatar" />
               <CardTitle tag="h4" className="fw-bold mt-3 mb-0">
-                Ghalia Rebaza
+                {paciente ? `${paciente.nombres} ${paciente.apellidos}` : 'Cargando...'}
               </CardTitle>
-              <CardSubtitle className="text-muted">GhaliaRebaza@gmail.com</CardSubtitle>
+              <CardSubtitle className="text-muted">{paciente ? paciente.email : 'Cargando...'}</CardSubtitle>
               <Row className="mt-4 pt-3">
-                <Col xs="4" className="text-center border-end">
-                  <h4 className="fw-bold mb-0">4</h4>
-                  <p className="text-muted mb-0 fs-6">Total</p>
-                </Col>
-                <Col xs="4" className="text-center border-end">
-                  <h4 className="fw-bold mb-0">2</h4>
-                  <p className="text-muted mb-0 fs-6">Open</p>
-                </Col>
-                <Col xs="4" className="text-center">
-                  <h4 className="fw-bold mb-0">3</h4>
-                  <p className="text-muted mb-0 fs-6">Closed</p>
+                <Col xs="12" className="text-center">
+                  <h4 className="fw-bold mb-0">ID del Paciente: {pacienteId || 'No disponible'}</h4>
                 </Col>
               </Row>
             </CardBody>
