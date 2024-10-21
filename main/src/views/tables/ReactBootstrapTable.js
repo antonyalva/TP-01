@@ -6,6 +6,29 @@ import './ReactBootstrapTable.scss';
 
 import ComponentCard from '../../components/ComponentCard';
 
+// Función para obtener el token de autorización
+const getAuthToken = () => {
+  return sessionStorage.getItem('authToken');
+};
+
+// Configuración de axios con el token de autorización
+const axiosInstance = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+});
+
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = getAuthToken();
+    if (token) {
+      config.headers['Authorization'] = token;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 function statusFormatter(cell) {
   let iconHtml = '';
 
@@ -35,7 +58,7 @@ const Datatables = () => {
 
   const fetchPacientes = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/dev/pacientes`);
+      const response = await axiosInstance.get('/dev/pacientes');
       setPacientes(response.data);
       setLoading(false);
     } catch (err) {
@@ -51,7 +74,7 @@ const Datatables = () => {
     }
 
     try {
-      await axios.delete(`${process.env.REACT_APP_API_URL}/dev/pacientes/${rowKeys[0]}`);
+      await axiosInstance.delete(`/dev/pacientes/${rowKeys[0]}`);
       setDeleteMessage({ type: 'success', text: 'Paciente eliminado exitosamente.' });
       fetchPacientes(); // Recargar la lista de pacientes
     } catch (error) {
