@@ -84,15 +84,14 @@ const Datatables = () => {
     blurToSave: true,
   };
 
-  // const optionsFormatter = (cell, row) => {
   const optionsFormatter = () => {
     return (
       <div>
-        <Button color="link" className="p-0 mr-2" title="Realizar examen">
-          <FontAwesomeIcon icon={faStethoscope} />
+        <Button color="primary" size="sm" className="mr-2" title="Realizar examen">
+          Realizar examen
         </Button>
-        <Button color="link" className="p-0" title="Ver resultado examen">
-          <FontAwesomeIcon icon={faFileAlt} />
+        <Button color="info" size="sm" title="Ver resultado examen">
+          Ver resultado
         </Button>
       </div>
     );
