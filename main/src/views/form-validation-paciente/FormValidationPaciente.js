@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Row, Col, Button, FormGroup, Label, Alert } from 'reactstrap';
 import { useForm } from 'react-hook-form';
 import Form from 'react-validation/build/form';
-import ComponentCard from '../../components/ComponentCard';
 import axios from 'axios';
+import ComponentCard from '../../components/ComponentCard';
 
 const getIdToken = () => {
   return sessionStorage.getItem('IdToken');
@@ -28,7 +28,7 @@ axiosInstance.interceptors.request.use(
 );
 
 const FormValidationPaciente = () => {
-  const navigate = useNavigate();
+  useNavigate();
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
   const [submitStatus, setSubmitStatus] = useState(null);
 
@@ -39,7 +39,7 @@ const FormValidationPaciente = () => {
         apellidos: data.lastname,
         email: data.email,
         documento_identidad: data.mobile,
-        edad: parseInt(data.age),
+        edad: parseInt(data.age, 10),
         compañia: data.compañia
       });
       console.log(response.data);

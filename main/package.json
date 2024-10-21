@@ -57,6 +57,7 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
+    "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "eslint": "^7.30.0",
     "eslint-config-airbnb": "^18.2.1",
     "eslint-config-prettier": "^8.3.0",

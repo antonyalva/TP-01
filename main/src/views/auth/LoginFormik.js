@@ -30,9 +30,9 @@ const LoginFormik = () => {
         password: values.password,
       });
 
-      if (response.data && response.data.accessToken) {
+      if (response.data && response.data.token) {
         // Almacenar el token en sessionStorage
-        sessionStorage.setItem('authToken', response.data.accessToken);
+        sessionStorage.setItem('IdToken', response.data.token);
         // Redirigir al dashboard
         navigate('/dashboards/minimal');
       } else {
