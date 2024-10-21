@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
-import { Table, Badge, UncontrolledTooltip, Input, Alert } from 'reactstrap';
-import { fetchTickets, DeleteTicket, SearchTicket } from '../../../store/apps/ticket/TicketSlice';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { Table, UncontrolledTooltip, Input, Alert } from 'reactstrap';
 import axios from 'axios';
+import { fetchTickets, SearchTicket } from '../../../store/apps/ticket/TicketSlice';
 
 // Función para obtener el token de autorización
 const getAuthToken = () => {
@@ -35,11 +35,6 @@ const TicketListing = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [deleteMessage, setDeleteMessage] = useState(null);
-
-  useEffect(() => {
-    dispatch(fetchTickets());
-    fetchDoctors();
-  }, [dispatch]);
 
   const fetchDoctors = useCallback(async () => {
     try {
@@ -98,13 +93,10 @@ const TicketListing = () => {
     }
   };
 
-  const tickets = useSelector((state) =>
-    getVisibleTickets(
-      state.ticketReducer.tickets,
-      state.ticketReducer.currentFilter,
-      state.ticketReducer.ticketSearch,
-    ),
-  );
+  useEffect(() => {
+    dispatch(fetchTickets());
+    fetchDoctors();
+  }, [dispatch, fetchDoctors]);
 
   return (
     <div>
