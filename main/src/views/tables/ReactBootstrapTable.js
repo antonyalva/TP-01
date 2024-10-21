@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Alert } from 'reactstrap';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import axios from 'axios';
@@ -29,18 +29,6 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-function statusFormatter(cell) {
-  let iconHtml = '';
-
-  if (cell === 'YES') {
-    iconHtml = '<a href="http://localhost:3000/tickt/ticket-detail" style="color:blue">Tomar test</a>';
-  } else if (cell === 'NO') {
-    iconHtml = '<a href="http://localhost:3000/ecom/shopdetail"style="color:green">Ver resultados</a>';
-  }
-
-  return <span dangerouslySetInnerHTML={{ __html: iconHtml }} />;
-}
-
 function afterSearch(searchText, result) {
   console.log(`Your search text is ${searchText}`);
   console.log('Result is:', result);
@@ -52,11 +40,7 @@ const Datatables = () => {
   const [error, setError] = useState(null);
   const [deleteMessage, setDeleteMessage] = useState(null);
 
-  useEffect(() => {
-    fetchPacientes();
-  }, []);
-
-  const fetchPacientes = async () => {
+  const fetchPacientes = useCallback(async () => {
     try {
       const response = await axiosInstance.get('/dev/pacientes');
       setPacientes(response.data);
@@ -65,7 +49,11 @@ const Datatables = () => {
       setError('Error al cargar los pacientes');
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchPacientes();
+  }, [fetchPacientes]);
 
   const onAfterDeleteRow = async (rowKeys) => {
     if (rowKeys.length !== 1) {
@@ -77,7 +65,7 @@ const Datatables = () => {
       await axiosInstance.delete(`/dev/pacientes/${rowKeys[0]}`);
       setDeleteMessage({ type: 'success', text: 'Paciente eliminado exitosamente.' });
       fetchPacientes(); // Recargar la lista de pacientes
-    } catch (error) {
+    } catch (err) {
       setDeleteMessage({ type: 'danger', text: 'Error al eliminar el paciente.' });
     }
   };
