@@ -1,9 +1,32 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { Table, Badge, UncontrolledTooltip, Input, Alert } from 'reactstrap';
 import { fetchTickets, DeleteTicket, SearchTicket } from '../../../store/apps/ticket/TicketSlice';
 import axios from 'axios';
+
+// Función para obtener el token de autorización
+const getAuthToken = () => {
+  return sessionStorage.getItem('authToken');
+};
+
+// Configuración de axios con el token de autorización
+const axiosInstance = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+});
+
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = getAuthToken();
+    if (token) {
+      config.headers.Authorization = token;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 const TicketListing = () => {
   const navigate = useNavigate();
@@ -18,26 +41,26 @@ const TicketListing = () => {
     fetchDoctors();
   }, [dispatch]);
 
-  const fetchDoctors = async () => {
+  const fetchDoctors = useCallback(async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/dev/doctores`);
+      const response = await axiosInstance.get('/dev/doctores');
       setDoctors(response.data);
       setLoading(false);
     } catch (err) {
       setError('Error al cargar los doctores');
       setLoading(false);
     }
-  };
+  }, []);
 
-  const deleteDoctor = async (id) => {
+  const deleteDoctor = useCallback(async (id) => {
     try {
-      await axios.delete(`${process.env.REACT_APP_API_URL}/dev/doctores/${id}`);
+      await axiosInstance.delete(`/dev/doctores/${id}`);
       setDeleteMessage({ type: 'success', text: 'Doctor eliminado exitosamente.' });
       fetchDoctors(); // Recargar la lista de doctores
-    } catch (error) {
+    } catch (err) {
       setDeleteMessage({ type: 'danger', text: 'Error al eliminar el doctor.' });
     }
-  };
+  }, [fetchDoctors]);
 
   const getVisibleTickets = (tickets, filter, ticketSearch) => {
     switch (filter) {
