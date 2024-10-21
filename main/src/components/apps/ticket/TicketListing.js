@@ -57,41 +57,6 @@ const TicketListing = () => {
     }
   }, [fetchDoctors]);
 
-  const getVisibleTickets = (tickets, filter, ticketSearch) => {
-    switch (filter) {
-      case 'total_tickets':
-        return tickets.filter(
-          (c) => !c.deleted && c.ticketTitle.toLocaleLowerCase().includes(ticketSearch),
-        );
-
-      case 'Pending':
-        return tickets.filter(
-          (c) =>
-            !c.deleted &&
-            c.Status === 'Pending' &&
-            c.ticketTitle.toLocaleLowerCase().includes(ticketSearch),
-        );
-
-      case 'Closed':
-        return tickets.filter(
-          (c) =>
-            !c.deleted &&
-            c.Status === 'Closed' &&
-            c.ticketTitle.toLocaleLowerCase().includes(ticketSearch),
-        );
-
-      case 'Open':
-        return tickets.filter(
-          (c) =>
-            !c.deleted &&
-            c.Status === 'Open' &&
-            c.ticketTitle.toLocaleLowerCase().includes(ticketSearch),
-        );
-
-      default:
-        throw new Error(`Unknown filter: ${filter}`);
-    }
-  };
 
   useEffect(() => {
     dispatch(fetchTickets());
