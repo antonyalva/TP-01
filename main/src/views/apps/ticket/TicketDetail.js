@@ -11,6 +11,7 @@ import {
   CardTitle,
   CardSubtitle,
   Input,
+  Alert,
 } from 'reactstrap';
 
 import img1 from '../../../assets/images/users/user1.jpg';
@@ -20,6 +21,7 @@ const TicketDetail = () => {
   const pacienteId = location.state?.pacienteId;
   const [file, setFile] = useState(null);
   const [paciente, setPaciente] = useState(null);
+  const [uploadStatus, setUploadStatus] = useState(null);
 
   useEffect(() => {
     if (pacienteId) {
@@ -33,32 +35,47 @@ const TicketDetail = () => {
       });
     }
   }, [pacienteId]);
+
   const handleFileChange = (e) => {
-    setFile(e.target.files[0]); // Guardamos el archivo seleccionado en el estado
+    const selectedFile = e.target.files[0];
+    if (selectedFile && selectedFile.type === 'audio/mpeg') {
+      setFile(selectedFile);
+    } else {
+      alert('Por favor, selecciona un archivo MP3.');
+      e.target.value = null;
+    }
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
    
     if (!file) {
-      alert('Por favor, selecciona un archivo.');
+      alert('Por favor, selecciona un archivo MP3.');
       return;
     }
 
-    const formData = new FormData();
-    formData.append('file', file);
-
     try {
-      console.log('ingresa a servicio pero no hay')
-      const response = await axios.post('http://localhost:3000/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = async () => {
+        const base64Audio = reader.result.split(',')[1];
 
-      alert(response.data.message);
+        const response = await axios.post('https://2ewq4qbzqh.execute-api.us-east-1.amazonaws.com/dev/examenes', {
+          pacienteId: pacienteId,
+          audio: base64Audio
+        }, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': sessionStorage.getItem('IdToken')
+          }
+        });
+
+        setUploadStatus({ type: 'success', message: 'Examen enviado con éxito' });
+        console.log(response.data);
+      };
     } catch (error) {
-      console.error('Error al subir el archivo:', error);
-      alert('Error al subir el archivo.');
+      console.error('Error al enviar el examen:', error);
+      setUploadStatus({ type: 'error', message: 'Error al enviar el examen' });
     }
   };
 
@@ -102,13 +119,17 @@ const TicketDetail = () => {
               <h5>Subir archivo</h5>
               <div className="button-group">
               <form onSubmit={handleSubmit}>
-                <Input type="file" id="fileInput" name="file" accept="image/*"onChange={handleFileChange} />
+                <Input type="file" id="fileInput" name="file" accept="audio/mpeg" onChange={handleFileChange} />
                 <Button className="btn" color="primary" size="lg" type="submit">
-                  Subir archivo
+                  Enviar examen
                 </Button>
-                </form>
+              </form>
               </div>
-
+              {uploadStatus && (
+                <Alert color={uploadStatus.type === 'success' ? 'success' : 'danger'} className="mt-3">
+                  {uploadStatus.message}
+                </Alert>
+              )}
             </CardBody>
           </Card>
           <Card>
@@ -124,38 +145,10 @@ const TicketDetail = () => {
                 </Col>
               </Row>
             </CardBody>
-            <CardBody>
-              <Row>
-                <Col xs="6" className="text-center border-end">
-                  <a
-                    href="/"
-                    className="text-dark d-flex align-items-center justify-content-center text-decoration-none fw-bold"
-                  >
-                    <i className="bi bi-chat-left-fill me-2"></i>
-                    Message
-                  </a>
-                </Col>
-                <Col xs="6" className="text-center">
-                  <a
-                    href="/"
-                    className="text-dark d-flex align-items-center justify-content-center text-decoration-none fw-bold"
-                  >
-                    <i className="bi bi-columns me-2"></i>
-                    Portfolio
-                  </a>
-                </Col>
-              </Row>
-            </CardBody>
           </Card>
-          {/* <Card>
-            <CardBody className='p-4'>
-              <CardTitle tag="h4">Ticket Statestics</CardTitle>
-              <Chart options={optionsorder} series={seriesorder} type="donut" height="245" />
-            </CardBody>
-          </Card> */}
         </Col>
       </Row>
-    </div >
+    </div>
   );
 };
 
