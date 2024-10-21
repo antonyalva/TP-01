@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Row, Col, Button, FormGroup, Label, Alert } from 'reactstrap';
 import { useForm } from 'react-hook-form';
 import Form from 'react-validation/build/form';
-import ComponentCard from '../../components/ComponentCard';
 import axios from 'axios';
+import ComponentCard from '../../components/ComponentCard';
 
 const getIdToken = () => {
   return sessionStorage.getItem('IdToken');
@@ -37,7 +37,7 @@ const FormValidate = () => {
         apellidos: data.lastname,
         email: data.email,
         documento_identidad: data.mobile,
-        edad: parseInt(data.age),
+        edad: parseInt(data.age, 10),
         especialidad: data.especialidad
       });
       console.log(response.data);
