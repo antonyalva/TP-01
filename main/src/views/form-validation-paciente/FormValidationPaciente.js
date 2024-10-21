@@ -6,6 +6,27 @@ import Form from 'react-validation/build/form';
 import ComponentCard from '../../components/ComponentCard';
 import axios from 'axios';
 
+const getIdToken = () => {
+  return sessionStorage.getItem('IdToken');
+};
+
+const axiosInstance = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+});
+
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = getIdToken();
+    if (token) {
+      config.headers.Authorization = token;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 const FormValidationPaciente = () => {
   const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
@@ -13,7 +34,7 @@ const FormValidationPaciente = () => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/dev/pacientes`, {
+      const response = await axiosInstance.post('/dev/pacientes', {
         nombres: data.firstname,
         apellidos: data.lastname,
         email: data.email,
