@@ -94,10 +94,6 @@ const LoginFormik = () => {
                         />
                       </FormGroup>
                       <FormGroup className="form-check d-flex" inline>
-                        {/* <Label check>
-                          <Input type="checkbox" />
-                          Remember me
-                        </Label> */}
                         <Link className="ms-auto text-decoration-none" to="/auth/forgotPwd">
                           <small>Ha olvidado su contraseña?</small>
                         </Link>
@@ -109,7 +105,7 @@ const LoginFormik = () => {
                       </FormGroup>
                     </Form>
                   )}
-                />
+                </Formik>
               </CardBody>
             </Card>
           </Col>
