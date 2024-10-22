@@ -55,24 +55,18 @@ const TicketDetail = () => {
     }
 
     try {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = async () => {
-        const base64Audio = reader.result.split(',')[1];
+      const formData = new FormData();
+      formData.append('audio', file);
 
-        const response = await axios.post('https://2ewq4qbzqh.execute-api.us-east-1.amazonaws.com/dev/examenes', {
-          pacienteId,
-          audio: base64Audio
-        }, {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': sessionStorage.getItem('IdToken')
-          }
-        });
+      const response = await axios.post(`https://2ewq4qbzqh.execute-api.us-east-1.amazonaws.com/dev/examenes?pacienteId=${pacienteId}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': sessionStorage.getItem('IdToken')
+        }
+      });
 
-        setUploadStatus({ type: 'success', message: 'Examen enviado con éxito' });
-        console.log(response.data);
-      };
+      setUploadStatus({ type: 'success', message: 'Examen enviado con éxito' });
+      console.log(response.data);
     } catch (error) {
       console.error('Error al enviar el examen:', error);
       setUploadStatus({ type: 'error', message: 'Error al enviar el examen' });
