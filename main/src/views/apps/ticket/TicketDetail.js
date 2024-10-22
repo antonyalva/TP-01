@@ -18,7 +18,7 @@ import img1 from '../../../assets/images/users/user1.jpg';
 
 const TicketDetail = () => {
   const location = useLocation();
-  const pacienteId = location.state?.pacienteId;
+  const pacienteId = location.state ? location.state.pacienteId : null;
   const [file, setFile] = useState(null);
   const [paciente, setPaciente] = useState(null);
   const [uploadStatus, setUploadStatus] = useState(null);
@@ -61,7 +61,7 @@ const TicketDetail = () => {
         const base64Audio = reader.result.split(',')[1];
 
         const response = await axios.post('https://2ewq4qbzqh.execute-api.us-east-1.amazonaws.com/dev/examenes', {
-          pacienteId: pacienteId,
+          pacienteId,
           audio: base64Audio
         }, {
           headers: {
