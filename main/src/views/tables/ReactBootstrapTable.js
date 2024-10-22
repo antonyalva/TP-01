@@ -102,7 +102,7 @@ const Datatables = () => {
           color="info" 
           size="sm" 
           title="Ver resultado examen"
-          onClick={() => navigate(`/apps/ecommerce/shopdetail/${row.id}`)}
+          onClick={() => navigate(`/ecom/shopdetail`, { state: { pacienteId: row.id } })}
         >
           Ver resultado
         </Button>
