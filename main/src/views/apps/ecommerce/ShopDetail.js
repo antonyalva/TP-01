@@ -74,8 +74,8 @@ const ShopDetail = () => {
                   <br />
                   <h6>Recomendaciones:</h6>
                   <ul>
-                    {resultadoExamen.resultado.recomendaciones.map((recomendacion, index) => (
-                      <li key={index}>{recomendacion}</li>
+                    {resultadoExamen.resultado.recomendaciones.map((recomendacion) => (
+                      <li key={recomendacion}>{recomendacion}</li>
                     ))}
                   </ul>
                   <br />
