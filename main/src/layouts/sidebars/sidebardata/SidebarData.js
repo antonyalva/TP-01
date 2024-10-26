@@ -149,6 +149,7 @@ const SidebarData = [
     id: 2.9,
     collapisble: false,
   },
+  
   { caption: 'UI' },
   {
     title: 'UI Elements',
@@ -260,7 +261,7 @@ const SidebarData = [
         icon: <Icon.Disc />,
       },
     ],
-  },*/
+  },
   //{ caption: 'Forms' },
   /*{
     title: 'Form Layouts',

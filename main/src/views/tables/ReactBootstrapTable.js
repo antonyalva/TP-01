@@ -88,24 +88,32 @@ const Datatables = () => {
 
   const optionsFormatter = (cell, row) => {
     return (
-      <div>
-        <Button 
-          color="primary" 
-          size="sm" 
-          className="mr-2" 
-          title="Realizar examen"
-          onClick={() => navigate(`/tickt/ticket-detail`, { state: { pacienteId: row.id } })}
-        >
-          Realizar examen
-        </Button>
-        <Button 
-          color="info" 
-          size="sm" 
-          title="Ver resultado examen"
-          onClick={() => navigate(`/ecom/shopdetail`, { state: { pacienteId: row.id } })}
-        >
-          Ver resultado
-        </Button>
+      <div className="row">
+        <div className="col-12 d-flex-center text-center mb-1">
+          <div>
+            <Button
+              color="primary"
+              size="sm"
+              title="Realizar examen"
+              onClick={() => navigate(`/tickt/ticket-detail`, { state: { pacienteId: row.id } })}
+            >
+              Realizar examen
+            </Button>
+          </div>
+        </div>
+
+        <div className="col-12 d-flex-center text-center">
+          <div>
+            <Button
+              color="info"
+              size="sm"
+              title="Ver resultado examen"
+              onClick={() => navigate(`/ecom/shopdetail`, { state: { pacienteId: row.id } })}
+            >
+              Ver resultado
+            </Button>
+          </div>
+        </div>
       </div>
     );
   };

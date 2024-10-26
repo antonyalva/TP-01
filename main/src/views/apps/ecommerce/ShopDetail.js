@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useLocation, useNavigate } from 'react-router-dom';
+import treeTableHOC from 'react-table-v6/lib/hoc/treeTable';
+import ReactTable from 'react-table-v6';
 import {
   Row,
   Col,
@@ -8,14 +10,21 @@ import {
   CardBody,
   Button,
 } from 'reactstrap';
+import 'react-table-v6/react-table.css';
+import ComponentCard from '../../../components/ComponentCard';
+//  import * as data from '../../tables/ReacTableData';
+
+const TreeTable = treeTableHOC(ReactTable);
 
 const ShopDetail = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const pacienteId = location.state ? location.state.pacienteId : null;
   const [resultadoExamen, setResultadoExamen] = useState(null);
+  const [examenHistorico, setExamenHistorico] = useState( );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  //const { treedata } = data;
 
   useEffect(() => {
     const fetchResultadoExamen = async () => {
@@ -41,6 +50,32 @@ const ShopDetail = () => {
 
     fetchResultadoExamen();
   }, [pacienteId]);
+
+  useEffect(() => {
+    const fetchExamenHistorico = async () => {
+      if (!pacienteId) {
+        setError('No se proporcionó ID de paciente');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await axios.get(`https://2ewq4qbzqh.execute-api.us-east-1.amazonaws.com/dev/examenes/historico?pacienteId=${pacienteId}`, {
+          headers: {
+            'Authorization': sessionStorage.getItem('IdToken')
+          }
+        });
+        console.log('resultado.data: ',response.data.examenes)
+        setExamenHistorico(response.data.examenes);
+        setLoading(false);
+      } catch (err) {
+        setError('Error al cargar el hitorial del examen');
+        setLoading(false);
+      }
+    };
+
+    fetchExamenHistorico();
+  },[pacienteId]);
 
   if (loading) return <div>Cargando...</div>;
   if (error) return <div>{error}</div>;
@@ -100,6 +135,83 @@ const ShopDetail = () => {
           </Card>
         </Col>
       </Row>
+      <ComponentCard title="Historial de examenes">
+        <TreeTable
+          filterable
+          defaultFilterMethod={(filter, row) => {
+            const id = filter.pivotId || filter.id;
+            return row[id] !== undefined
+              ? String(row[id]).toLowerCase().includes(filter.value.toLowerCase())
+              : true;
+          }}
+          data={examenHistorico}
+          //data={treedata}
+          pivotBy={['examenId']}
+          columns={[
+            // we only require the accessor so TreeTable
+            // can handle the pivot automatically
+            {
+              accessor: 'examenId',
+            },
+            {
+              accessor: 'fechaExamen',
+            },
+            {
+              accessor: 'diagnostico',
+            },
+            {
+              accessor: 'precisionModelo',
+            },
+
+            // any other columns we want to display
+            // {
+            //   Header: 'fecha de examen',
+            //   accessor: 'fechaExamen',
+            // },
+            // {
+            //   Header: 'Codigo de examen',
+            //   accessor: 'examen_id',
+            // },
+            
+          ]}
+          defaultPageSize={3}
+          SubComponent={(row) => {
+            // a SubComponent just for the final detail
+            const columns = [
+              {
+                Header: 'Titulo',
+                accessor: 'property',
+                width: 200,
+                Cell: (ci) => {
+                  return `${ci.value}:`;
+                },
+                style: {
+                  backgroundColor: '#DDD',
+                  textAlign: 'right',
+                  fontWeight: 'bold',
+                },
+              },
+              { Header: 'Detalle', accessor: 'value' },
+            ];
+            const rowData = Object.keys(row.original).map((key) => {
+              return {
+                property: key,
+                value: row.original[key].toString(),
+              };
+            });
+            return (
+              <div style={{ padding: '10px' }}>
+                <ReactTable
+                  data={rowData}
+                  columns={columns}
+                  pageSize={rowData.length}
+                  showPagination={false}
+                />
+              </div>
+            );
+          }}
+        />
+      </ComponentCard>
     </div>
   );
 };
