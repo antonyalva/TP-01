@@ -52,14 +52,14 @@ const SidebarData = [
   {
     title: 'Pacientes',
     href: '/tables/data-table',
-    icon: <Icon.HardDrive />,
+    icon: <Icon.User />,
     id: 4.3,
     collapisble: false,
   },
   {
     title: 'Doctores',
     href: '/tickt/ticket-list',
-    icon: <Icon.Disc />,
+    icon: <Icon.User />,
   },
   // {
   //   title: 'Calendar',
@@ -71,13 +71,13 @@ const SidebarData = [
   {
     title: 'Realizar Examen',
     href: '/tickt/ticket-detail',
-    icon: <Icon.Disc />,
+    icon: <Icon.FileText />,
   },
   
   {
-    title: 'Restultados',
+    title: 'Resultados',
     href: '/ecom/shopdetail',
-    icon: <Icon.Disc />,
+    icon: <Icon.Droplet />,
   },
   /*{
     title: 'Chat',
@@ -142,7 +142,7 @@ const SidebarData = [
       },
     ],
   },*/
-  /*{
+  {
     title: 'TreeView',
     href: '/apps/treeview',
     icon: <Icon.Triangle />,
@@ -260,7 +260,7 @@ const SidebarData = [
         icon: <Icon.Disc />,
       },
     ],
-  },*/
+  },
   //{ caption: 'Forms' },
   /*{
     title: 'Form Layouts',
@@ -313,14 +313,14 @@ const SidebarData = [
   {
     title: 'Registrar doctor',
     href: '/form-validation',
-    icon: <Icon.CheckSquare />,
+    icon: <Icon.UserCheck />,
     id: 3.3,
     collapisble: false,
   },
   {
     title: 'Registrar paciente',
     href: '/form-validation-paciente',
-    icon: <Icon.CheckSquare />,
+    icon: <Icon.UserCheck />,
     //id: 3.3,
     collapisble: false,
   },
