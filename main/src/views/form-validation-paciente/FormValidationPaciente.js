@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import {useLocation } from 'react-router-dom';
 import { Row, Col, Button, FormGroup, Label, Alert } from 'reactstrap';
 import { useForm } from 'react-hook-form';
 import Form from 'react-validation/build/form';
@@ -28,33 +28,81 @@ axiosInstance.interceptors.request.use(
 );
 
 const FormValidationPaciente = () => {
-  useNavigate();
-  const { register, handleSubmit, formState: { errors }, reset } = useForm();
+  //const navigate = useNavigate();
+  const { state } = useLocation(); // Obtenemos el estado de la navegación (si estamos en modo edición)
+  const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm();
   const [submitStatus, setSubmitStatus] = useState(null);
+  const [isEditMode, setIsEditMode] = useState(false);
 
-  const onSubmit = async (data) => {
+  // Función para cargar los datos del paciente cuando estamos en modo edición
+  const fetchPaciente = async (id) => {
     try {
-      const response = await axiosInstance.post('/dev/pacientes', {
-        nombres: data.firstname,
-        apellidos: data.lastname,
-        email: data.email,
-        documento_identidad: data.mobile,
-        edad: parseInt(data.age, 10),
-        compañia: data.compañia
-      });
-      console.log(response.data);
-      setSubmitStatus({ type: 'success', message: 'Paciente registrado exitosamente' });
-      reset();
+      const response = await axiosInstance.get(`/dev/pacientes/${id}`);
+      const paciente = response.data;
+
+      // Cargamos los valores del paciente en los campos del formulario
+      setValue('firstname', paciente.nombres);
+      setValue('lastname', paciente.apellidos);
+      setValue('email', paciente.email);
+      setValue('mobile', paciente.documento_identidad);
+      setValue('age', paciente.edad);
+      setValue('compañia', paciente.compañia);
+
+      setIsEditMode(true); // Indicamos que estamos en modo edición
     } catch (error) {
-      console.error('Error al registrar paciente:', error);
-      setSubmitStatus({ type: 'error', message: 'Error al registrar paciente' });
+      console.error('Error al cargar los datos del paciente:', error);
     }
   };
+
+  useEffect(() => {
+    // Si hay un estado (id) pasado desde la navegación, significa que estamos en modo edición
+    if (state && state.id) {
+      fetchPaciente(state.id);
+    }
+  }, [state]);
+
+  const onSubmit = async (data) => {
+    if (isEditMode) {
+      // Modo edición (actualizar paciente)
+      try {
+        await axiosInstance.put(`/dev/pacientes/${state.id}`, {
+          nombres: data.firstname,
+          apellidos: data.lastname,
+          email: data.email,
+          documento_identidad: data.mobile,
+          edad: parseInt(data.age, 10),
+          compañia: data.compañia
+        });
+        setSubmitStatus({ type: 'success', message: 'Paciente actualizado exitosamente' });
+      } catch (error) {
+        console.error('Error al actualizar paciente:', error);
+        setSubmitStatus({ type: 'error', message: 'Error al actualizar paciente' });
+      }
+    } else {
+      // Modo registro (nuevo paciente)
+      try {
+        await axiosInstance.post('/dev/pacientes', {
+          nombres: data.firstname,
+          apellidos: data.lastname,
+          email: data.email,
+          documento_identidad: data.mobile,
+          edad: parseInt(data.age, 10),
+          compañia: data.compañia
+        });
+        setSubmitStatus({ type: 'success', message: 'Paciente registrado exitosamente' });
+        reset();
+      } catch (error) {
+        console.error('Error al registrar paciente:', error);
+        setSubmitStatus({ type: 'error', message: 'Error al registrar paciente' });
+      }
+    }
+  };
+
   return (
     <>
       <Row>
         <Col sm="12">
-          <ComponentCard title="Registrar Paciente">
+          <ComponentCard title={isEditMode ? 'Editar Paciente' : 'Registrar Paciente'}>
             <Form onSubmit={handleSubmit(onSubmit)}>
               <FormGroup>
                 <Label className="control-Label" htmlFor="firstname">
@@ -67,7 +115,7 @@ const FormValidationPaciente = () => {
                     className="form-control"
                   />
                 </div>
-                <span className="text-danger">{errors.firstname && 'First name is required.'}</span>
+                <span className="text-danger">{errors.firstname && 'El campo Nombres es requerido'}</span>
               </FormGroup>
               <FormGroup>
                 <Label className="control-Label" htmlFor="lastname">
@@ -80,25 +128,8 @@ const FormValidationPaciente = () => {
                     className="form-control"
                   />
                 </div>
-                <span className="text-danger">{errors.lastname && 'Last name is required.'}</span>
+                <span className="text-danger">{errors.lastname && 'El campo Apellidos es requerido'}</span>
               </FormGroup>
-              {/* <FormGroup>
-                <Label className="control-Label" htmlFor="title">
-                  Especialidad
-                </Label>
-                <div className="mb-2">
-                  <select
-                    className="form-control"
-                    {...register('title', { required: true })}
-                  >
-                    <option value="">Select Option</option>
-                    <option value="Mr">Mr</option>
-                    <option value="Mrs">Mrs</option>
-                    <option value="Miss">Miss</option>
-                  </select>
-                </div>
-                <span className="text-danger">{errors.title && 'Please select value.'}</span>
-              </FormGroup> */}
               <FormGroup>
                 <Label className="control-Label" htmlFor="email">
                   Email
@@ -110,7 +141,7 @@ const FormValidationPaciente = () => {
                     className="form-control"
                   />
                 </div>
-                <span className="text-danger">{errors.email && 'Email es requerido.'}</span>
+                <span className="text-danger">{errors.email && 'El campo Email es requerido'}</span>
               </FormGroup>
               <FormGroup>
                 <Label className="control-Label" htmlFor="mobile">
@@ -151,11 +182,11 @@ const FormValidationPaciente = () => {
                     className="form-control"
                   />
                 </div>
-                <span className="text-danger">{errors.compañia && 'La compañía es requerida.'}</span>
+                <span className="text-danger">{errors.compañia && 'El campo Compañía es requerido'}</span>
               </FormGroup>
               <FormGroup>
                 <Button className="btn" color="primary" size="lg" block type="submit">
-                  Registrar Paciente
+                  {isEditMode ? 'Guardar cambios' : 'Registrar Paciente'}
                 </Button>
               </FormGroup>
             </Form>

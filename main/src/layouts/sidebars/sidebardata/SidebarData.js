@@ -73,13 +73,13 @@ const SidebarData = [
     href: '/tickt/ticket-detail',
     icon: <Icon.Disc />,
   },
-  
+  /*
   {
-    title: 'Restultados',
+    title: 'Resultados',
     href: '/ecom/shopdetail',
     icon: <Icon.Disc />,
   },
-  /*{
+  {
     title: 'Chat',
     href: '/apps/chat',
     icon: <Icon.MessageCircle />,

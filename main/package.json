@@ -21,6 +21,7 @@
     "draft-js": "^0.11.7",
     "formik": "^2.2.9",
     "history": "^5.0.0",
+    "jwt-decode": "^4.0.0",
     "moment": "^2.29.1",
     "multer": "^1.4.5-lts.1",
     "namor": "^1.1.3",

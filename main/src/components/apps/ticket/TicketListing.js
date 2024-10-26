@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Table, UncontrolledTooltip, Input, Alert } from 'reactstrap';
 import axios from 'axios';
-import { fetchTickets, SearchTicket } from '../../../store/apps/ticket/TicketSlice';
+//import { fetchTickets, SearchTicket } from '../../../store/apps/ticket/TicketSlice';
 
 // Función para obtener el token de autorización
 const getIdToken = () => {
@@ -34,12 +34,15 @@ const TicketListing = () => {
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState(''); // Estado para el término de búsqueda
+  const [filteredDoctors, setFilteredDoctors] = useState([]); 
   const [deleteMessage, setDeleteMessage] = useState(null);
-
+  
   const fetchDoctors = useCallback(async () => {
     try {
       const response = await axiosInstance.get('/dev/doctores');
       setDoctors(response.data);
+      setFilteredDoctors(response.data); // Inicialmente, los doctores filtrados son los mismos
       setLoading(false);
     } catch (err) {
       setError('Error al cargar los doctores');
@@ -48,18 +51,39 @@ const TicketListing = () => {
   }, []);
 
   const deleteDoctor = useCallback(async (id) => {
-    try {
-      await axiosInstance.delete(`/dev/doctores/${id}`);
-      setDeleteMessage({ type: 'success', text: 'Doctor eliminado exitosamente.' });
-      fetchDoctors(); // Recargar la lista de doctores
-    } catch (err) {
-      setDeleteMessage({ type: 'danger', text: 'Error al eliminar el doctor.' });
+    const isConfirmed = window.confirm('¿Estás seguro de que deseas eliminar este doctor?'); // Mensaje de confirmación
+    if (isConfirmed) {
+      try {
+        await axiosInstance.delete(`/dev/doctores/${id}`);
+        setDeleteMessage({ type: 'success', text: 'Doctor eliminado exitosamente.' });
+        fetchDoctors(); // Recargar la lista de doctores
+      } catch (err) {
+        setDeleteMessage({ type: 'danger', text: 'Error al eliminar el doctor.' });
+      }
     }
   }, [fetchDoctors]);
 
+  // Función para manejar la edición y redirigir a la vista de editar con el ID del doctor
+  const handleEditDoctor = (doctorId) => {
+    navigate(`/form-validation`, { state: { id: doctorId, mode: 'edit' } });
+  };
 
+  // Función para manejar la búsqueda de doctores
+  const handleSearch = (e) => {
+    const searchValue = e.target.value.toLowerCase();
+    setSearchTerm(searchValue);
+    
+    const filtered = doctors.filter((doctor) =>
+      doctor.nombres.toLowerCase().includes(searchValue) ||
+      doctor.apellidos.toLowerCase().includes(searchValue) ||
+      doctor.email.toLowerCase().includes(searchValue) ||
+      doctor.documento_identidad.includes(searchValue)
+    );
+    
+    setFilteredDoctors(filtered); // Actualizar los doctores filtrados
+  };
   useEffect(() => {
-    dispatch(fetchTickets());
+    //dispatch(fetchTickets());
     fetchDoctors();
   }, [dispatch, fetchDoctors]);
 
@@ -69,8 +93,9 @@ const TicketListing = () => {
         <div className="col-3 ">
           <Input
             type="text"
-            onChange={(e) => dispatch(SearchTicket(e.target.value))}
-            placeholder="Search Ticket..."
+            placeholder="Buscar Doctor..."
+            value={searchTerm} // Conectar el input con el estado searchTerm
+            onChange={handleSearch} // Manejar la búsqueda cuando se escribe algo
           />
         </div>
         <div className="col-6 ">
@@ -78,13 +103,13 @@ const TicketListing = () => {
         </div>
         <div className="col-3 d-flex-end text-end">
         <span
-                        className="btn btn-info text-white"
-                        onClick={() => {
-                          navigate('/form-validation-paciente');
-                        }}
-                      >
-                        REGISTRAR PACIENTE
-                      </span>
+          className="btn btn-info text-white"
+          onClick={() => {
+            navigate('/form-validation');
+          }}
+        >
+                        REGISTRAR DOCTOR
+        </span>
         </div>
       </div>
       {loading ? (
@@ -92,20 +117,21 @@ const TicketListing = () => {
       ) : error ? (
         <div>{error}</div>
       ) : (
-        <Table className="align-middle">
-          <thead>
-            <tr>
-              <th>Nombres</th>
-              <th>Apellidos</th>
+      <Table className="align-middle">
+        <thead>
+          <tr>
+            <th>Nombres</th>
+            <th>Apellidos</th>
               <th>Email</th>
               <th>Documento de Identidad</th>
               <th>Edad</th>
               <th>Especialidad</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {doctors.map((doctor) => (
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+        {filteredDoctors.length > 0 ? (
+            filteredDoctors.map((doctor) => (
               <tr key={doctor.id}>
                 <td>{doctor.nombres}</td>
                 <td>{doctor.apellidos}</td>
@@ -113,11 +139,11 @@ const TicketListing = () => {
                 <td>{doctor.documento_identidad}</td>
                 <td>{doctor.edad}</td>
                 <td>{doctor.especialidad}</td>
-                <td>
-                  <i
+              <td>
+                <i
                     className="bi bi-pencil cursor-pointer me-2"
                     id={`EditTooltip-${doctor.id}`}
-                    onClick={() => {/* Implementar edición */}}
+                    onClick={() => handleEditDoctor(doctor.id)} // Llama a la función de edición
                   />
                   <UncontrolledTooltip placement="top" target={`EditTooltip-${doctor.id}`}>
                     Editar
@@ -126,15 +152,21 @@ const TicketListing = () => {
                     className="bi bi-trash cursor-pointer"
                     id={`DeleteTooltip-${doctor.id}`}
                     onClick={() => deleteDoctor(doctor.id)}
-                  />
+                />
                   <UncontrolledTooltip placement="top" target={`DeleteTooltip-${doctor.id}`}>
                     Eliminar
-                  </UncontrolledTooltip>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
+                </UncontrolledTooltip>
+              </td>
+            </tr>
+          ))
+        ) : (  <tr>
+          <td colSpan="7" className="text-center">
+            No se encontraron doctores.
+          </td>
+        </tr>
+      )}
+        </tbody>
+      </Table>
       )}
       {deleteMessage && (
         <Alert color={deleteMessage.type} className="mt-3">

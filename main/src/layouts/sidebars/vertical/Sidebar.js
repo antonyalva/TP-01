@@ -1,4 +1,6 @@
 import React from 'react';
+import { jwtDecode } from 'jwt-decode'; // Importar como un named export
+import axios from 'axios';
 import {
   //Button,
   Nav,
@@ -19,7 +21,48 @@ import NavItemContainer from './NavItemContainer';
 import NavSubMenu from './NavSubMenu';
 
 import user1 from '../../../assets/images/users/user4.jpg';
+// Función para obtener el token de autorización
+const getIdToken = () => {
+  return sessionStorage.getItem('IdToken');
+};
 
+// Función para obtener el usuario a partir del token
+const getUserFromToken = () => {
+  const token = getIdToken();
+  if (!token) return null;
+
+  try {
+    // Decodificamos el token para obtener los datos del usuario
+    const decodedToken = jwtDecode(token);
+    return decodedToken; // Aquí estarán los datos del usuario (como nombre, email, etc.)
+  } catch (error) {
+    console.error("Error al decodificar el token:", error);
+    return null;
+  }
+};
+
+// Ejemplo de uso
+const user = getUserFromToken();
+console.log("revisar user")
+console.log(user); // Aquí deberías ver los datos del usuario (si están en el token)
+
+// Configuración de axios con el token de autorización
+const axiosInstance = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+});
+
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = getIdToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`; // Agregamos el token en el encabezado de autorización
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 const Sidebar = () => {
   const location = useLocation();
   const currentURL = location.pathname.split('/').slice(0, -1).join('/');

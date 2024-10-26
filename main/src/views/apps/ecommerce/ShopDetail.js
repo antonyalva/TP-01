@@ -1,20 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
-import treeTableHOC from 'react-table-v6/lib/hoc/treeTable';
-import ReactTable from 'react-table-v6';
 import {
   Row,
   Col,
-  Card,
+  Card,CardHeader,Table,
   CardBody,
   Button,
 } from 'reactstrap';
 import 'react-table-v6/react-table.css';
-import ComponentCard from '../../../components/ComponentCard';
 //  import * as data from '../../tables/ReacTableData';
 
-const TreeTable = treeTableHOC(ReactTable);
 
 const ShopDetail = () => {
   const location = useLocation();
@@ -69,7 +65,7 @@ const ShopDetail = () => {
         setExamenHistorico(response.data.examenes);
         setLoading(false);
       } catch (err) {
-        setError('Error al cargar el hitorial del examen');
+        setError('Este usuario no cuenta con tests realizado, por favor seleccionar uno que tenga Resultados');
         setLoading(false);
       }
     };
@@ -84,15 +80,20 @@ const ShopDetail = () => {
     <div>
       <Row>
         <Col lg="12">
+        <Card>
+            <CardBody>
+              <h3>Resultado del Examen de Parkinson</h3>
+            </CardBody>
+          </Card>
           <Card>
             <CardBody>
               <Row>
                 <Col lg="12">
-                  <h3 className="mt-2 mb-3">Resultado del Examen de Parkinson</h3>
+                  
                   <p className="text-muted py-3">
                     Paciente ID: {resultadoExamen.pacienteId}
                   </p>
-                  <h2>Diagnóstico: {resultadoExamen.resultado.diagnostico}</h2>
+                  <h3>Diagnóstico: {resultadoExamen.resultado.diagnostico}</h3>
                   <br />
                   <h6>Precisión del Modelo</h6>
                   <h2>Porcentaje de precisión: {resultadoExamen.resultado.precisionModelo}%</h2>
@@ -135,83 +136,45 @@ const ShopDetail = () => {
           </Card>
         </Col>
       </Row>
-      <ComponentCard title="Historial de examenes">
-        <TreeTable
-          filterable
-          defaultFilterMethod={(filter, row) => {
-            const id = filter.pivotId || filter.id;
-            return row[id] !== undefined
-              ? String(row[id]).toLowerCase().includes(filter.value.toLowerCase())
-              : true;
-          }}
-          data={examenHistorico}
-          //data={treedata}
-          pivotBy={['examenId']}
-          columns={[
-            // we only require the accessor so TreeTable
-            // can handle the pivot automatically
-            {
-              accessor: 'examenId',
-            },
-            {
-              accessor: 'fechaExamen',
-            },
-            {
-              accessor: 'diagnostico',
-            },
-            {
-              accessor: 'precisionModelo',
-            },
-
-            // any other columns we want to display
-            // {
-            //   Header: 'fecha de examen',
-            //   accessor: 'fechaExamen',
-            // },
-            // {
-            //   Header: 'Codigo de examen',
-            //   accessor: 'examen_id',
-            // },
-            
-          ]}
-          defaultPageSize={3}
-          SubComponent={(row) => {
-            // a SubComponent just for the final detail
-            const columns = [
-              {
-                Header: 'Titulo',
-                accessor: 'property',
-                width: 200,
-                Cell: (ci) => {
-                  return `${ci.value}:`;
-                },
-                style: {
-                  backgroundColor: '#DDD',
-                  textAlign: 'right',
-                  fontWeight: 'bold',
-                },
-              },
-              { Header: 'Detalle', accessor: 'value' },
-            ];
-            const rowData = Object.keys(row.original).map((key) => {
-              return {
-                property: key,
-                value: row.original[key].toString(),
-              };
-            });
-            return (
-              <div style={{ padding: '10px' }}>
-                <ReactTable
-                  data={rowData}
-                  columns={columns}
-                  pageSize={rowData.length}
-                  showPagination={false}
-                />
-              </div>
-            );
-          }}
-        />
-      </ComponentCard>
+                    
+      <Card className="mb-4 shadow-sm">
+      {/* Título del Card */}
+      <CardHeader className="bg-primary text-white">
+        <h4 className="mb-0">Historial de Exámenes</h4>
+      </CardHeader>
+      
+      {/* Contenido del Card */}
+      <CardBody>
+        <Table responsive striped bordered hover>
+          <thead>
+            <tr>
+              <th>ID de Examen</th>
+              <th>Fecha de Examen</th>
+              <th>Diagnóstico</th>
+              <th>Precisión del Modelo</th>
+            </tr>
+          </thead>
+          <tbody>
+            {examenHistorico && examenHistorico.length > 0 ? (
+              examenHistorico.map((examen) => (
+                <tr key={examen.examenId}>
+                  <td>{examen.examenId}</td>
+                  <td>{examen.fechaExamen}</td>
+                  <td>{examen.diagnostico}</td>
+                  <td>{examen.precisionModelo}%</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="4" className="text-center">
+                  No hay exámenes disponibles.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </Table>
+      </CardBody>
+    </Card>
     </div>
   );
 };
