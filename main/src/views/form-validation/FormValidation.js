@@ -1,35 +1,31 @@
 import React, { useState } from 'react';
-import { Row, Col, Button, FormGroup, Label } from 'reactstrap';
-// import { Row, Col, Button, FormGroup, Label, ListGroup, ListGroupItem } from 'reactstrap';
+import axios from 'axios';
+import { Row, Col, Button, FormGroup, Label, Alert } from 'reactstrap';
 import { useForm } from 'react-hook-form';
 import Form from 'react-validation/build/form';
 import ComponentCard from '../../components/ComponentCard';
-import * as data2 from '../tables/DataBootstrapTable';
-
-/*const RegistrarDoctor = () => {
-    //setComposeModal(!composeModal);
-};*/
 
 const FormValidate = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm(); // initialise the hook
-  const [setFormvalue] = useState({
-    // const [Formvalue, setFormvalue] = useState({
-    firstname: '',
-    lastname: '',
-    email: '',
-    age: '',
-    title: '',
-    mobile: '',
-  });
-  const onSubmit = (data) => {
-    data2.JsonData.push({
-      name: data.firstname,
-      gender: data.firstname,
-      email: data.email,
-    });
-    console.log(data.firstname)
-    //console.log(data2)
-    setFormvalue(data);
+  const { register, handleSubmit, formState: { errors }, reset } = useForm();
+  const [submitStatus, setSubmitStatus] = useState(null);
+
+  const onSubmit = async (data) => {
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL_LOCAL}/dev/doctores`, {
+        nombres: data.firstname,
+        apellidos: data.lastname,
+        email: data.email,
+        documento_identidad: data.mobile,
+        edad: parseInt(data.age, 10),
+        especialidad: data.especialidad
+      });
+      console.log(response.data);
+      setSubmitStatus({ type: 'success', message: 'Doctor registrado exitosamente' });
+      reset();
+    } catch (error) {
+      console.error('Error al registrar doctor:', error);
+      setSubmitStatus({ type: 'error', message: 'Error al registrar doctor' });
+    }
   };
   return (
     <>
@@ -87,7 +83,7 @@ const FormValidate = () => {
                 <div className="mb-2">
                   <input
                     type="text"
-                    {...register('usernemailame', { required: true, pattern: /^\S+@\S+$/i })}
+                    {...register('email', { required: true, pattern: /^\S+@\S+$/i })}
                     className="form-control"
                   />
                 </div>
@@ -105,7 +101,7 @@ const FormValidate = () => {
                   />
                 </div>
                 <span className="text-danger">
-                  {errors.mobile && 'Enter a Valid mobile number.'}
+                  {errors.mobile && 'Ingrese un número de DNI válido.'}
                 </span>
               </FormGroup>
               <FormGroup>
@@ -119,17 +115,32 @@ const FormValidate = () => {
                     className="form-control"
                   />
                 </div>
-                <span className="text-danger">{errors.age && 'Please enter number for age.'}</span>
+                <span className="text-danger">{errors.age && 'Por favor, ingrese un número para la edad.'}</span>
+              </FormGroup>
+              <FormGroup>
+                <Label className="control-Label" htmlFor="especialidad">
+                  Especialidad
+                </Label>
+                <div className="mb-2">
+                  <input
+                    type="text"
+                    {...register('especialidad', { required: true })}
+                    className="form-control"
+                  />
+                </div>
+                <span className="text-danger">{errors.especialidad && 'La especialidad es requerida.'}</span>
               </FormGroup>
               <FormGroup>
                 <Button className="btn" color="primary" size="lg" block type="submit">
-                {/* <Button className="btn" color="primary" size="lg" block */}
-                  {/* onClick={RegistrarDoctor}> */}
                   Registrar
                 </Button>
-
               </FormGroup>
             </Form>
+            {submitStatus && (
+              <Alert color={submitStatus.type === 'success' ? 'success' : 'danger'}>
+                {submitStatus.message}
+              </Alert>
+            )}
           </ComponentCard>
         </Col>
       </Row>
