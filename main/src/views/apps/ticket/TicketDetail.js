@@ -31,8 +31,9 @@ const TicketDetail = () => {
   const [modalOpen, setModalOpen] = useState(false); // Estado para el modal
   const [isRecording, setIsRecording] = useState(false);
   const [audioURL, setAudioURL] = useState('');
+  const [audioFile, setAudioFile] = useState('');
   const [recordingTime, setRecordingTime] = useState(0);
-  const [maxRecordingTime] = useState(60);
+  const [maxRecordingTime] = useState(30);
   const mediaRecorderRef = useRef(null);
   const chunks = useRef([]);
   const intervalRef = useRef(null);
@@ -76,6 +77,7 @@ const TicketDetail = () => {
     const selectedFile = e.target.files[0];
     if (selectedFile && selectedFile.type === 'audio/mpeg') {
       setFile(selectedFile);
+      console.log(selectedFile)
     } else {
       alert('Por favor, selecciona un archivo MP3.');
       e.target.value = null;
@@ -111,6 +113,28 @@ const TicketDetail = () => {
     }
   };
 
+  const handleSubmit2 = async () => {
+    
+    console.log(audioFile)
+
+    try {
+      const formData = new FormData();
+      formData.append('audio', audioFile);
+
+      const response = await axios.post(`https://2ewq4qbzqh.execute-api.us-east-1.amazonaws.com/dev/examenes?pacienteId=${pacienteId}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': sessionStorage.getItem('IdToken')
+        }
+      });
+
+      setUploadStatus({ type: 'success', message: 'Examen enviado con éxito' });
+      console.log(response.data);
+    } catch (error) {
+      console.error('Error al enviar el examen:', error);
+      setUploadStatus({ type: 'error', message: 'Error al enviar el examen' });
+    }
+  };
   
 
   const stopRecording = () => {
@@ -131,7 +155,15 @@ const TicketDetail = () => {
 
     mediaRecorderRef.current.onstop = () => {
       const audioBlob = new Blob(chunks.current, { type: 'audio/mp3' });
+
+      const audioFileRecord = new File([audioBlob], 'grabacion.mp3', {
+        type: 'audio/mpeg',
+        lastModified: Date.now(),
+      });
+      setAudioFile(audioFileRecord);
+
       const audioURLLocal = URL.createObjectURL(audioBlob);
+      console.log(audioURLLocal)
       setAudioURL(audioURLLocal);
       chunks.current = [];
     };
@@ -280,10 +312,10 @@ const TicketDetail = () => {
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button color="primary" disabled={!audioURL}>
+                <Button color="primary" disabled={!audioURL} onClick={handleSubmit2}>
                   Enviar grabación
                 </Button>
-                <Button color="secondary" >
+                <Button color="secondary" onClick={toggleModal} >
                   Cancel
                 </Button>
               </ModalFooter>
