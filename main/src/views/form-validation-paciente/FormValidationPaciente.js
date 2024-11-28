@@ -28,44 +28,54 @@ axiosInstance.interceptors.request.use(
 );
 
 const FormValidationPaciente = () => {
-  //const navigate = useNavigate();
-  const { state } = useLocation(); // Obtenemos el estado de la navegación (si estamos en modo edición)
   const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm();
+  const { state } = useLocation(); // Obtenemos el estado de la navegación (si estamos en modo edición)
   const [submitStatus, setSubmitStatus] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [paciente, setPaciente] = useState({
+    nombres: '',
+    apellidos: '',
+    email: '',
+    documento_identidad: '',
+    edad: '',
+    compañia: ''
+  });
 
   // Función para cargar los datos del paciente cuando estamos en modo edición
   const fetchPaciente = async (id) => {
     try {
       const response = await axiosInstance.get(`/dev/pacientes/${id}`);
-      const paciente = response.data;
-
+      const pacienteData = response.data;
+      setPaciente(pacienteData);
       // Cargamos los valores del paciente en los campos del formulario
-      setValue('firstname', paciente.nombres);
-      setValue('lastname', paciente.apellidos);
-      setValue('email', paciente.email);
-      setValue('mobile', paciente.documento_identidad);
-      setValue('age', paciente.edad);
-      setValue('compañia', paciente.compañia);
+      setValue('firstname', pacienteData.nombres);
+      setValue('lastname', pacienteData.apellidos);
+      setValue('email', pacienteData.email);
+      setValue('mobile', pacienteData.documento_identidad);
+      setValue('age', pacienteData.edad);
+      setValue('compañia', pacienteData.compañia);
 
-      setIsEditMode(true); // Indicamos que estamos en modo edición
     } catch (error) {
       console.error('Error al cargar los datos del paciente:', error);
     }
   };
-
+  console.log(state)
   useEffect(() => {
     // Si hay un estado (id) pasado desde la navegación, significa que estamos en modo edición
-    if (state && state.id) {
+    if (state && state.mode === 'edit' && state.id) {
+      // Modo editar: cargar datos del paciente
+      setIsEditMode(true);
       fetchPaciente(state.id);
     }
   }, [state]);
 
   const onSubmit = async (data) => {
+    console.log('varianñe___')
+    console.log(isEditMode)
     if (isEditMode) {
       // Modo edición (actualizar paciente)
       try {
-        await axiosInstance.put(`/dev/pacientes/${state.id}`, {
+        const response = await axiosInstance.put(`/dev/pacientes/${state.id}`, {
           nombres: data.firstname,
           apellidos: data.lastname,
           email: data.email,
@@ -73,6 +83,7 @@ const FormValidationPaciente = () => {
           edad: parseInt(data.age, 10),
           compañia: data.compañia
         });
+        console.log(response.data);
         setSubmitStatus({ type: 'success', message: 'Paciente actualizado exitosamente' });
       } catch (error) {
         console.error('Error al actualizar paciente:', error);
@@ -113,6 +124,8 @@ const FormValidationPaciente = () => {
                     type="text"
                     {...register('firstname', { required: true })}
                     className="form-control"
+                    value={paciente.nombres} // Usando el estado doctor para controlar el valor
+                    onChange={(e) => setPaciente({ ...paciente, nombres: e.target.value })} // Actualiza el estado
                   />
                 </div>
                 <span className="text-danger">{errors.firstname && 'El campo Nombres es requerido'}</span>

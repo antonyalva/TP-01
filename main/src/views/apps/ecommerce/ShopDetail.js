@@ -22,6 +22,8 @@ const ShopDetail = () => {
   const [error, setError] = useState(null);
   //const { treedata } = data;
 
+  console.log(pacienteId)
+  /*
   useEffect(() => {
     const fetchResultadoExamen = async () => {
       if (!pacienteId) {
@@ -46,32 +48,38 @@ const ShopDetail = () => {
 
     fetchResultadoExamen();
   }, [pacienteId]);
-
-  useEffect(() => {
-    const fetchExamenHistorico = async () => {
+*/
+  
+    useEffect(() => {
       if (!pacienteId) {
         setError('No se proporcionó ID de paciente');
         setLoading(false);
         return;
       }
-
-      try {
-        const response = await axios.get(`https://2ewq4qbzqh.execute-api.us-east-1.amazonaws.com/dev/examenes/historico?pacienteId=${pacienteId}`, {
-          headers: {
-            'Authorization': sessionStorage.getItem('IdToken')
-          }
-        });
-        console.log('resultado.data: ',response.data.examenes)
-        setExamenHistorico(response.data.examenes);
-        setLoading(false);
-      } catch (err) {
-        setError('Este usuario no cuenta con tests realizado, por favor seleccionar uno que tenga Resultados');
-        setLoading(false);
-      }
-    };
-
-    fetchExamenHistorico();
-  },[pacienteId]);
+    
+      const fetchDatos = async () => {
+        try {
+          const resultadoResponse = await axios.get(
+            `https://2ewq4qbzqh.execute-api.us-east-1.amazonaws.com/dev/examenes/resultado?pacienteId=${pacienteId}`,
+            { headers: { Authorization: sessionStorage.getItem('IdToken') } }
+          );
+          setResultadoExamen(resultadoResponse.data);
+    
+          const historicoResponse = await axios.get(
+            `https://2ewq4qbzqh.execute-api.us-east-1.amazonaws.com/dev/examenes/historico?pacienteId=${pacienteId}`,
+            { headers: { Authorization: sessionStorage.getItem('IdToken') } }
+          );
+          setExamenHistorico(historicoResponse.data.examenes);
+    
+          setLoading(false);
+        } catch (err) {
+          setError('Este paciente no tiene exámenes realizados');
+          setLoading(false);
+        }
+      };
+    
+      fetchDatos();
+    }, [pacienteId]);
 
   if (loading) return <div>Cargando...</div>;
   if (error) return <div>{error}</div>;
@@ -95,8 +103,15 @@ const ShopDetail = () => {
                   </p>
                   <h3>Diagnóstico: {resultadoExamen.resultado.diagnostico}</h3>
                   <br />
-                  <h6>Precisión del Modelo</h6>
-                  <h2>Porcentaje de precisión: {resultadoExamen.resultado.precisionModelo}%</h2>
+                  <h6>Métricas del Modelo</h6>
+                  <br />
+                  <h4>Porcentaje de precisión: {resultadoExamen.resultado.precisionModelo}%</h4>
+                 
+                  <h4>Porcentaje de especificidad: 88%</h4>
+                 
+                  <h4>Porcentaje de precisión: 87%</h4>
+    
+                  <h4>Porcentaje de exactitud: 89%</h4>
                   <br />
                   <h6>Parámetros Acústicos Analizados:</h6>
                   <p>

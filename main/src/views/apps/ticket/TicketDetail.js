@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import { useForm } from 'react-hook-form';
 import { useLocation } from 'react-router-dom';
 import { FaMicrophone, FaStop } from 'react-icons/fa'; // Importa íconos de FontAwesome
 import {
@@ -22,9 +23,32 @@ import {
 
 import img1 from '../../../assets/images/users/user1.jpg';
 
+const getIdToken = () => {
+  return sessionStorage.getItem('IdToken');
+};
+
+const axiosInstance = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+});
+
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = getIdToken();
+    if (token) {
+      config.headers.Authorization = token;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 const TicketDetail = () => {
   const location = useLocation();
   const pacienteId = location.state ? location.state.pacienteId : null;
+  const { setValue } = useForm();
+  //const { state } = useLocation(); // Obtenemos el estado de la navegación (si estamos en modo edición)
+
   const [file, setFile] = useState(null);
   const [paciente, setPaciente] = useState(null);
   const [uploadStatus, setUploadStatus] = useState(null);
@@ -57,9 +81,26 @@ const TicketDetail = () => {
       resetRecording();
     }
   }, [modalOpen]);
+  const fetchPaciente = async (id) => {
+    try {
+      const response = await axiosInstance.get(`/dev/pacientes/${id}`);
+      const pacienteData = response.data;
+      setPaciente(pacienteData);
+      // Cargamos los valores del paciente en los campos del formulario
+      setValue('firstname', pacienteData.nombres);
+      setValue('lastname', pacienteData.apellidos);
+      setValue('email', pacienteData.email);
+      setValue('mobile', pacienteData.documento_identidad);
+      setValue('age', pacienteData.edad);
+      setValue('compañia', pacienteData.compañia);
 
+    } catch (error) {
+      console.error('Error al cargar los datos del paciente:', error);
+    }
+  };
   useEffect(() => {
     if (pacienteId) {
+      fetchPaciente(pacienteId);
       // Aquí deberías hacer una llamada a tu API para obtener los detalles del paciente
       // Por ahora, simularemos esto con un objeto de paciente de ejemplo
       setPaciente({

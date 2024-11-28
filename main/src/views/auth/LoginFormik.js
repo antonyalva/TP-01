@@ -40,7 +40,7 @@ const LoginFormik = () => {
       }
     } catch (error) {
       console.error('Login error:', error);
-      setLoginError('An error occurred during login. Please try again.');
+      setLoginError('La contraseña o el email son incorrectos');
     }
     setSubmitting(false);
   };

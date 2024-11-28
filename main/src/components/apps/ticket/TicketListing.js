@@ -90,6 +90,7 @@ const TicketListing = () => {
   return (
     <div>
       <div className="row">
+        <h2 mb="10">Listado de Doctores</h2>
         <div className="col-3 ">
           <Input
             type="text"

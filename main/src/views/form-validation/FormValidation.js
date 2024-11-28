@@ -54,6 +54,7 @@ const FormValidate = () => {
       setValue('mobile', doctorData.documento_identidad);
       setValue('age', doctorData.edad);
       setValue('especialidad', doctorData.especialidad);
+      
     } catch (err) {
       console.error('Error al cargar el doctor:', err);
     }
@@ -89,7 +90,7 @@ const FormValidate = () => {
           nombres: data.firstname,
           apellidos: data.lastname,
           email: data.email,
-          documento_identidad: data.mobile,
+          documento_identidad: data.dni,
           edad: parseInt(data.age, 10),
           especialidad: data.especialidad,
           password: data.password
@@ -135,6 +136,72 @@ const FormValidate = () => {
               </div>
               <span className="text-danger">{errors.lastname && 'El apellido es requerido.'}</span>
             </FormGroup>
+            <FormGroup>
+              <Label className="control-Label" htmlFor="email">Email</Label>
+              <div className="mb-2">
+                <input
+                  type="text"
+                  {...register('email', { required: true })}
+                  className="form-control"
+                  value={doctor.email} // Usando el estado doctor para controlar el valor
+                  onChange={(e) => setDoctor({ ...doctor, email: e.target.value })} // Actualiza el estado
+                />
+              </div>
+              <span className="text-danger">{errors.email && 'El password es requerido.'}</span>
+            </FormGroup>
+            <FormGroup>
+              <Label className="control-Label" htmlFor="password">Password</Label>
+              <div className="mb-2">
+                <input
+                  type="text"
+                  {...register('password', { required: true })}
+                  className="form-control"
+                  value={doctor.password} // Usando el estado doctor para controlar el valor
+                  onChange={(e) => setDoctor({ ...doctor, password: e.target.value })} // Actualiza el estado
+                />
+              </div>
+              <span className="text-danger">{errors.lastname && 'El email es requerido.'}</span>
+            </FormGroup>
+            <FormGroup>
+              <Label className="control-Label" htmlFor="dni">DNI</Label>
+              <div className="mb-2">
+                <input
+                  type="text"
+                  {...register('dni', { required: true })}
+                  className="form-control"
+                  value={doctor.dni} // Usando el estado doctor para controlar el valor
+                  onChange={(e) => setDoctor({ ...doctor, dni: e.target.value })} // Actualiza el estado
+                />
+              </div>
+              <span className="text-danger">{errors.lastname && 'El DNI es requerido.'}</span>
+            </FormGroup>
+            <FormGroup>
+              <Label className="control-Label" htmlFor="age">Edad</Label>
+              <div className="mb-2">
+                <input
+                  type="text"
+                  {...register('age', { required: true })}
+                  className="form-control"
+                  value={doctor.edad} // Usando el estado doctor para controlar el valor
+                  onChange={(e) => setDoctor({ ...doctor, edad: e.target.value })} // Actualiza el estado
+                />
+              </div>
+              <span className="text-danger">{errors.lastname && 'La edad es requerida.'}</span>
+            </FormGroup>
+            <FormGroup>
+              <Label className="control-Label" htmlFor="especialidad">Especialidad</Label>
+              <div className="mb-2">
+                <input
+                  type="text"
+                  {...register('especialidad', { required: true })}
+                  className="form-control"
+                  value={doctor.especialidad} // Usando el estado doctor para controlar el valor
+                  onChange={(e) => setDoctor({ ...doctor, especialidad: e.target.value })} // Actualiza el estado
+                />
+              </div>
+              <span className="text-danger">{errors.lastname && 'La edad es requerida.'}</span>
+            </FormGroup>
+            
             {/* Otras secciones del formulario... */}
             <FormGroup>
               <Button className="btn" color="primary" size="lg" block type="submit">
