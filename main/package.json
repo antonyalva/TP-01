@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "homepage": "/",
   "private": true,
+  "proxy": "http://127.0.0.1:8000",  
   "dependencies": {
     "@blueprintjs/core": "^4.4.1",
     "@casl/ability": "^5.4.4",
@@ -56,6 +57,7 @@
     "redux": "^4.1.2",
     "sass": "^1.52.2",
     "simplebar-react": "^2.3.6",
+    "sweetalert2": "^11.14.5",
     "web-vitals": "^1.1.2",
     "yup": "^0.32.11"
   },

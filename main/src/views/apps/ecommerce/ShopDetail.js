@@ -15,6 +15,7 @@ import 'react-table-v6/react-table.css';
 
 const ShopDetail = () => {
   const location = useLocation();
+  const responseData = location.state?.response;
   const navigate = useNavigate();
   const pacienteId = location.state ? location.state.pacienteId : null;
   const [resultadoExamen, setResultadoExamen] = useState(null);
@@ -24,32 +25,10 @@ const ShopDetail = () => {
   //const { treedata } = data;
 
   console.log(pacienteId)
-  /*
-  useEffect(() => {
-    const fetchResultadoExamen = async () => {
-      if (!pacienteId) {
-        setError('No se proporcionó ID de paciente');
-        setLoading(false);
-        return;
-      }
+  console.log(responseData.metrics.sensibilidad)
+  
+  const roundToTwoDecimals = (num) => Math.round(num * 100) / 100;
 
-      try {
-        const response = await axios.get(`https://2ewq4qbzqh.execute-api.us-east-1.amazonaws.com/dev/examenes/resultado?pacienteId=${pacienteId}`, {
-          headers: {
-            'Authorization': sessionStorage.getItem('IdToken')
-          }
-        });
-        setResultadoExamen(response.data);
-        setLoading(false);
-      } catch (err) {
-        setError('Error al cargar el resultado del examen');
-        setLoading(false);
-      }
-    };
-
-    fetchResultadoExamen();
-  }, [pacienteId]);
-*/
   
     useEffect(() => {
       if (!pacienteId) {
@@ -111,13 +90,14 @@ const ShopDetail = () => {
                   <br />
                   <h6>Métricas del Modelo</h6>
                   <br />
-                  <h4>Porcentaje de precisión: {resultadoExamen.resultado.precisionModelo}%</h4>
+                  <h4>Porcentaje de precisión: {roundToTwoDecimals(responseData.metrics.especificidad*100)}%</h4>
                  
-                  <h4>Porcentaje de especificidad: 88%</h4>
+                  <h4>Porcentaje de sensibilidad: {roundToTwoDecimals(responseData.metrics.sensibilidad*100)}%</h4>
+                  {/* <h4>Porcentaje de especificidad: {responseData.metrics.sensibilidad}88%</h4> */}
                  
-                  <h4>Porcentaje de precisión: 87%</h4>
+                  <h4>Porcentaje de precisión: {roundToTwoDecimals(responseData.metrics.precision*100)}%</h4>
     
-                  <h4>Porcentaje de exactitud: 89%</h4>
+                  <h4>Porcentaje de exactitud: {roundToTwoDecimals(responseData.metrics.exactitud*100)}%</h4>
                   <br />
                   <h6>Parámetros Acústicos Analizados:</h6>
                   <p>

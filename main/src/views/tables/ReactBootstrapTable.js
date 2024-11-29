@@ -116,7 +116,7 @@ const Datatables = () => {
       <div>
         
       </div>
-      <div className="row">
+      <div className="row mb-4">
         <h2 mb="10">Listado de Pacientes</h2>
         <div className="col-3 ">
           <Input
@@ -145,7 +145,7 @@ const Datatables = () => {
       ) : error ? (
         <div>{error}</div>
       ) : (
-      <Table className="align-middle"  >
+      <Table className="table table-striped table-hover table-bordered"  >
         <thead>
           <tr>
             <th>Nombres</th>
@@ -158,7 +158,7 @@ const Datatables = () => {
             <th>Opciones</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody >
         {filteredPacientes.length > 0 ? (
             filteredPacientes.map((paciente) => (
               <tr key={paciente.id}>

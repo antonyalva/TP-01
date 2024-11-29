@@ -8,6 +8,8 @@ import reportWebVitals from './reportWebVitals';
 import { store } from './store/Store';
 import App from './App';
 import './data';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 const container = document.getElementById('root');
 const root = createRoot(container);

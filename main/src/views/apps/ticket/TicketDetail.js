@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { FaMicrophone, FaStop } from 'react-icons/fa'; // Importa íconos de FontAwesome
 import {
   Row,
@@ -20,6 +20,7 @@ import {
   ModalFooter,
   Progress 
 } from 'reactstrap';
+import Swal from 'sweetalert2';
 
 import img1 from '../../../assets/images/users/user1.jpg';
 
@@ -44,6 +45,7 @@ axiosInstance.interceptors.request.use(
   }
 );
 const TicketDetail = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const pacienteId = location.state ? location.state.pacienteId : null;
   const { setValue } = useForm();
@@ -128,40 +130,89 @@ const TicketDetail = () => {
     handleFileChange(e); // Ejecutar tu lógica de cambio de archivo
     setFileSelected(e.target.files.length > 0); // Verificar si se seleccionó un archivo
   };
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!file) {
-      alert('Por favor, selecciona un archivo MP3.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Por favor, selecciona un archivo MP3.',
+      });
       return;
     }
-
+  
     try {
       const formData = new FormData();
-      formData.append('audio', file);
+      formData.append('file', file);
 
-      const response = await axios.post(`https://2ewq4qbzqh.execute-api.us-east-1.amazonaws.com/dev/examenes?pacienteId=${pacienteId}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          'Authorization': sessionStorage.getItem('IdToken')
+      const responseMetricas = await axios.post(
+        '/detect-parkinson/',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data', // Tipo de contenido para enviar archivos
+          },
         }
+      );
+      console.log('Respuesta del servicio local:', responseMetricas.data);
+  
+      const response = await axios.post(
+        `https://2ewq4qbzqh.execute-api.us-east-1.amazonaws.com/dev/examenes?pacienteId=${pacienteId}`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: sessionStorage.getItem('IdToken'),
+          },
+        }
+      );
+  
+      // Mostrar mensaje de éxito con SweetAlert2
+      Swal.fire({
+        position: 'center',
+        icon: 'success',
+        title: 'Los cambios han sido guardados',
+        showConfirmButton: false,
+        timer: 1500,
       });
-
+  
       setUploadStatus({ type: 'success', message: 'Examen enviado con éxito' });
+         // Redirigir al componente ShopDetail con el response
+      navigate('/ecom/shopdetail', { state: { response: responseMetricas.data, pacienteId } });
+
       console.log(response.data);
     } catch (error) {
+      // Mostrar mensaje de error con SweetAlert2
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Error al enviar el examen. Por favor, inténtalo nuevamente.',
+      });
+  
       console.error('Error al enviar el examen:', error);
       setUploadStatus({ type: 'error', message: 'Error al enviar el examen' });
     }
   };
+  
 
   const handleSubmit2 = async () => {
     
-    console.log(audioFile)
-
     try {
       const formData = new FormData();
-      formData.append('audio', audioFile);
+      //formData.append('audio', audioFile);
+      formData.append('file', audioFile);
 
+      const responseMetricas = await axios.post(
+        '/detect-parkinson/',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data', // Tipo de contenido para enviar archivos
+          },
+        }
+      );
+      
       const response = await axios.post(`https://2ewq4qbzqh.execute-api.us-east-1.amazonaws.com/dev/examenes?pacienteId=${pacienteId}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -169,11 +220,21 @@ const TicketDetail = () => {
         }
       });
 
+      // Mostrar mensaje de éxito con SweetAlert2
+      Swal.fire({
+        position: 'center',
+        icon: 'success',
+        title: 'Los cambios han sido guardados',
+        showConfirmButton: false,
+        timer: 1500,
+      });
       setUploadStatus({ type: 'success', message: 'Examen enviado con éxito' });
       console.log(response.data);
        // Cerrar el modal tras un envío exitoso
       setModalOpen(false);
       resetRecording(); // Resetea la grabación tras cerrar el modal
+      navigate('/ecom/shopdetail', { state: { response: responseMetricas.data, pacienteId } });
+
 
     } catch (error) {
       console.error('Error al enviar el examen:', error);
