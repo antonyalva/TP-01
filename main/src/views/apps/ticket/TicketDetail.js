@@ -171,6 +171,10 @@ const TicketDetail = () => {
 
       setUploadStatus({ type: 'success', message: 'Examen enviado con éxito' });
       console.log(response.data);
+       // Cerrar el modal tras un envío exitoso
+      setModalOpen(false);
+      resetRecording(); // Resetea la grabación tras cerrar el modal
+
     } catch (error) {
       console.error('Error al enviar el examen:', error);
       setUploadStatus({ type: 'error', message: 'Error al enviar el examen' });

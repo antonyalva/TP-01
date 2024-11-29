@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { format } from "date-fns";
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Row,
@@ -80,6 +81,11 @@ const ShopDetail = () => {
     
       fetchDatos();
     }, [pacienteId]);
+
+   // Aquí ordenamos los datos y los formateamos antes de renderizar
+  const examenesOrdenados = examenHistorico
+  ? [...examenHistorico].sort((a, b) => new Date(b.fechaExamen) - new Date(a.fechaExamen))
+  : [];
 
   if (loading) return <div>Cargando...</div>;
   if (error) return <div>{error}</div>;
@@ -170,11 +176,12 @@ const ShopDetail = () => {
             </tr>
           </thead>
           <tbody>
-            {examenHistorico && examenHistorico.length > 0 ? (
-              examenHistorico.map((examen) => (
+            {examenesOrdenados && examenesOrdenados.length > 0 ? (
+              examenesOrdenados.map((examen) => (
                 <tr key={examen.examenId}>
                   <td>{examen.examenId}</td>
-                  <td>{examen.fechaExamen}</td>
+                  <td>{format(new Date(examen.fechaExamen), "dd/MM/yyyy HH:mm:ss")}</td>
+
                   <td>{examen.diagnostico}</td>
                   <td>{examen.precisionModelo}%</td>
                 </tr>
