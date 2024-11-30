@@ -95,14 +95,20 @@ const Datatables = () => {
 
 
   const deletePaciente = useCallback(async (id) => {
-    const isConfirmed = window.confirm('¿Estás seguro de que deseas eliminar este paciente?'); // Mensaje de confirmación
+    const isConfirmed = window.confirm('¿Estás seguro de que deseas eliminar este paciente?');
     if (isConfirmed) {
       try {
-        await axiosInstance.delete(`/dev/paciente/${id}`);
-        setDeleteMessage({ type: 'success', text: 'Paciente eliminado exitosamente.' });
-        fetchPacientes(); // Recargar la lista de doctores
+        const response = await axiosInstance.delete(`/dev/pacientes/${id}`);
+        if (response.status === 200 ||response.status === 204 ) {
+          setDeleteMessage({ type: 'success', text: 'Paciente eliminado exitosamente.' });
+          fetchPacientes(); // Recargar la lista de pacientes
+        } else {
+          setDeleteMessage({ type: 'danger', text: `Error inesperado: ${response.statusText}` });
+        }
       } catch (err) {
-        setDeleteMessage({ type: 'danger', text: 'Error al eliminar el paciente.' });
+        console.error('Error al eliminar el paciente:', err.response || err.message || err);
+        const errorMsg = err.response?.data?.message || 'Error al eliminar el paciente.';
+        setDeleteMessage({ type: 'danger', text: errorMsg });
       }
     }
   }, [fetchPacientes]);

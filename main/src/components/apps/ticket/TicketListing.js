@@ -6,7 +6,7 @@ import axios from 'axios';
 //import { fetchTickets, SearchTicket } from '../../../store/apps/ticket/TicketSlice';
 
 // Función para obtener el token de autorización
-const getIdToken = () => {
+const getIdToken = () => {  
   return sessionStorage.getItem('IdToken');
 };
 

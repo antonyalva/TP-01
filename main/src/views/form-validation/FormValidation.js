@@ -90,7 +90,7 @@ const FormValidate = () => {
           nombres: data.firstname,
           apellidos: data.lastname,
           email: data.email,
-          documento_identidad: data.dni,
+          documento_identidad: data.documento_identidad,
           edad: parseInt(data.age, 10),
           especialidad: data.especialidad,
           password: data.password
@@ -150,27 +150,32 @@ const FormValidate = () => {
               <span className="text-danger">{errors.email && 'El password es requerido.'}</span>
             </FormGroup>
             <FormGroup>
-              <Label className="control-Label" htmlFor="password">Password</Label>
-              <div className="mb-2">
-                <input
-                  type="text"
-                  {...register('password', { required: true })}
-                  className="form-control"
-                  value={doctor.password} // Usando el estado doctor para controlar el valor
-                  onChange={(e) => setDoctor({ ...doctor, password: e.target.value })} // Actualiza el estado
-                />
-              </div>
-              <span className="text-danger">{errors.lastname && 'El email es requerido.'}</span>
+      
+            {!isEditMode && ( // Mostrar el Label y el campo solo si no está en modo editar
+              <>
+                <Label className="control-Label" htmlFor="password">Password</Label>
+                <div className="mb-2">
+                  <input
+                    type="text"
+                    {...register('password', { required: true })}
+                    className="form-control"
+                    value={doctor.password} // Usando el estado doctor para controlar el valor
+                    onChange={(e) => setDoctor({ ...doctor, password: e.target.value })} // Actualiza el estado
+                  />
+                </div>
+              </>
+            )}
+              <span className="text-danger">{errors.lastname && 'El password es requerido.'}</span>
             </FormGroup>
             <FormGroup>
-              <Label className="control-Label" htmlFor="dni">DNI</Label>
+              <Label className="control-Label" htmlFor="documento_identidad">DNI</Label>
               <div className="mb-2">
                 <input
                   type="text"
-                  {...register('dni', { required: true })}
+                  {...register('documento_identidad', { required: true })}
                   className="form-control"
-                  value={doctor.dni} // Usando el estado doctor para controlar el valor
-                  onChange={(e) => setDoctor({ ...doctor, dni: e.target.value })} // Actualiza el estado
+                  value={doctor.documento_identidad} // Usando el estado doctor para controlar el valor
+                  onChange={(e) => setDoctor({ ...doctor, documento_identidad: e.target.value })} // Actualiza el estado
                 />
               </div>
               <span className="text-danger">{errors.lastname && 'El DNI es requerido.'}</span>
@@ -199,7 +204,7 @@ const FormValidate = () => {
                   onChange={(e) => setDoctor({ ...doctor, especialidad: e.target.value })} // Actualiza el estado
                 />
               </div>
-              <span className="text-danger">{errors.lastname && 'La edad es requerida.'}</span>
+              <span className="text-danger">{errors.lastname && 'La especialidad es requerida.'}</span>
             </FormGroup>
             
             {/* Otras secciones del formulario... */}

@@ -81,7 +81,7 @@ const FormValidationPaciente = () => {
           email: data.email,
           documento_identidad: data.mobile,
           edad: parseInt(data.age, 10),
-          compañia: data.compañia
+          compania: data.compañia
         });
         console.log(response.data);
         setSubmitStatus({ type: 'success', message: 'Paciente actualizado exitosamente' });
