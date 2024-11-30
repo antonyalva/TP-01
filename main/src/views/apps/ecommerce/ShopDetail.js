@@ -25,7 +25,7 @@ const ShopDetail = () => {
   //const { treedata } = data;
 
   console.log(pacienteId)
-  console.log(responseData.metrics.sensibilidad)
+  //console.log(responseData.metrics.sensibilidad)
   
   const roundToTwoDecimals = (num) => Math.round(num * 100) / 100;
 
@@ -90,7 +90,7 @@ const ShopDetail = () => {
                   <br />
                   <h6>Métricas del Modelo</h6>
                   <br />
-                  <h4>Porcentaje de precisión: {roundToTwoDecimals(responseData.metrics.especificidad*100)}%</h4>
+                  <h4>Porcentaje de especificidad: {roundToTwoDecimals(responseData.metrics.especificidad*100)}%</h4>
                  
                   <h4>Porcentaje de sensibilidad: {roundToTwoDecimals(responseData.metrics.sensibilidad*100)}%</h4>
                   {/* <h4>Porcentaje de especificidad: {responseData.metrics.sensibilidad}88%</h4> */}

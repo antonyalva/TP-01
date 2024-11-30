@@ -49,6 +49,7 @@ const TicketDetail = () => {
   const location = useLocation();
   const pacienteId = location.state ? location.state.pacienteId : null;
   const { setValue } = useForm();
+  const [errorMessage, setErrorMessage] = useState("");
   //const { state } = useLocation(); // Obtenemos el estado de la navegación (si estamos en modo edición)
 
   const [file, setFile] = useState(null);
@@ -118,17 +119,50 @@ const TicketDetail = () => {
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
-    if (selectedFile && selectedFile.type === 'audio/mpeg') {
-      setFile(selectedFile);
-      console.log(selectedFile)
+    if (selectedFile) {
+      // Verificar si el tipo MIME es correcto
+      if (selectedFile.type !== "audio/mpeg") {
+        setErrorMessage("Por favor, selecciona un archivo MP3 válido.");
+        setFileSelected(false); // Deshabilita el botón
+        setFile(null); // Limpia el archivo
+        return;
+      }
+  
+      // Verificar si el tamaño es mayor a 10 MB
+      if (selectedFile.size > 10 * 1024 * 1024) {
+        setErrorMessage("El archivo seleccionado es mayor a 10 MB.");
+        setFileSelected(false); // Deshabilita el botón
+        setFile(null); // Limpia el archivo
+        return;
+      }
+  
+      // Validar contenido del archivo (opcional)
+      const reader = new FileReader();
+      reader.onload = () => {
+        const content = reader.result;
+        // Validar que el contenido tenga la estructura básica de un archivo MP3
+        const isValidMP3 = content.includes("ID3") || content.includes("ftypM4A"); // Etiquetas comunes de MP3
+        if (!isValidMP3) {
+          setErrorMessage("El archivo no parece ser un archivo MP3 válido.");
+          setFileSelected(false); // Deshabilita el botón
+          setFile(null); // Limpia el archivo
+          return;
+        }
+        // Si pasa todas las validaciones
+        setErrorMessage(""); // Limpia mensajes de error
+        setFileSelected(true); // Habilita el botón
+        setFile(selectedFile); // Guarda el archivo
+      };
+      reader.readAsText(selectedFile); // Leer contenido del archivo como texto
     } else {
-      alert('Por favor, selecciona un archivo MP3.');
-      e.target.value = null;
+      setErrorMessage(""); // Limpia mensajes si no hay archivo
+      setFileSelected(false); // Deshabilita el botón
+      setFile(null); // Limpia el archivo
     }
   };
   const handleFileInputChange = (e) => {
     handleFileChange(e); // Ejecutar tu lógica de cambio de archivo
-    setFileSelected(e.target.files.length > 0); // Verificar si se seleccionó un archivo
+    //setFileSelected(e.target.files.length > 0); // Verificar si se seleccionó un archivo
   };
   
   const handleSubmit = async (e) => {
@@ -142,58 +176,59 @@ const TicketDetail = () => {
       return;
     }
   
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
+      try {
+        const formData = new FormData();
+        console.log(formData)
+        formData.append('file', file);
+        console.log(file)
+        const responseMetricas = await axios.post(
+          '/detect-parkinson/',
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data', // Tipo de contenido para enviar archivos
+            },
+          }
+        );
+        console.log('Respuesta del servicio local:', responseMetricas.data);
+    
+        const response = await axios.post(
+          `https://2ewq4qbzqh.execute-api.us-east-1.amazonaws.com/dev/examenes?pacienteId=${pacienteId}`,
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: sessionStorage.getItem('IdToken'),
+            },
+          }
+        );
+    
+        // Mostrar mensaje de éxito con SweetAlert2
+        Swal.fire({
+          position: 'center',
+          icon: 'success',
+          title: 'Los cambios han sido guardados',
+          showConfirmButton: false,
+          timer: 1500,
+        });
+    
+        setUploadStatus({ type: 'success', message: 'Examen enviado con éxito' });
+          // Redirigir al componente ShopDetail con el response
+        navigate('/ecom/shopdetail', { state: { response: responseMetricas.data, pacienteId } });
 
-      const responseMetricas = await axios.post(
-        '/detect-parkinson/',
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data', // Tipo de contenido para enviar archivos
-          },
-        }
-      );
-      console.log('Respuesta del servicio local:', responseMetricas.data);
-  
-      const response = await axios.post(
-        `https://2ewq4qbzqh.execute-api.us-east-1.amazonaws.com/dev/examenes?pacienteId=${pacienteId}`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: sessionStorage.getItem('IdToken'),
-          },
-        }
-      );
-  
-      // Mostrar mensaje de éxito con SweetAlert2
-      Swal.fire({
-        position: 'center',
-        icon: 'success',
-        title: 'Los cambios han sido guardados',
-        showConfirmButton: false,
-        timer: 1500,
-      });
-  
-      setUploadStatus({ type: 'success', message: 'Examen enviado con éxito' });
-         // Redirigir al componente ShopDetail con el response
-      navigate('/ecom/shopdetail', { state: { response: responseMetricas.data, pacienteId } });
-
-      console.log(response.data);
-    } catch (error) {
-      // Mostrar mensaje de error con SweetAlert2
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Error al enviar el examen. Por favor, inténtalo nuevamente.',
-      });
-  
-      console.error('Error al enviar el examen:', error);
-      setUploadStatus({ type: 'error', message: 'Error al enviar el examen' });
-    }
-  };
+        console.log(response.data);
+      } catch (error) {
+        // Mostrar mensaje de error con SweetAlert2
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Error al enviar el examen. Por favor, inténtalo nuevamente.',
+        });
+    
+        console.error('Error al enviar el examen:', error);
+        setUploadStatus({ type: 'error', message: 'Error al enviar el examen' });
+      }
+    };
   
 
   const handleSubmit2 = async () => {
@@ -233,7 +268,7 @@ const TicketDetail = () => {
        // Cerrar el modal tras un envío exitoso
       setModalOpen(false);
       resetRecording(); // Resetea la grabación tras cerrar el modal
-      navigate('/ecom/shopdetail', { state: { response: responseMetricas.data, pacienteId } });
+      navigate('/ecom/shopdetail', { state: { response:  responseMetricas?.data || {}, pacienteId } });
 
 
     } catch (error) {
@@ -450,6 +485,8 @@ const TicketDetail = () => {
                   onChange={handleFileInputChange} // Cambié para manejar habilitación del botón
                   className="mt-2"
                 />
+                {/* Mensaje de error */}
+                 {errorMessage && <p className="text-danger mt-2">{errorMessage}</p>}  
 
                 {/* Botón de Enviar examen, habilitado solo si hay un archivo */}
                 <Button
